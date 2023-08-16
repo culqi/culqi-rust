@@ -112,4 +112,23 @@ mod tests {
             Err(e) => eprintln!("Error: {}", e),
         }
     }
+
+    #[test]
+    fn test_update_token() {
+
+            let body = r#"{
+                "metadata": {
+                   "dni": "5831543",
+                   "cliente_id": 259
+                   }
+            }"#;
+
+            match update("tokens", "tkn_test_20HjpSkdDlSdoHEC" ,body) {
+                Ok((response_text, status_code)) => {
+                    println!("Status Code: {}", status_code);
+                    println!("Response Text: {}", response_text);
+                }
+                Err(err) => println!("Error: {:?}", err),
+            }
+    }
 }
