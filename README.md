@@ -41,16 +41,11 @@ culqi = "0.0.1"
 Para empezar a enviar peticiones al API de Culqi debes configurar tu llave pública (pk), llave privada (sk).
 Para habilitar encriptación de payload debes configurar tu rsa_id y rsa_public_key.
 
-```go
-func main() {
-  // 1. llaves
-  culqi.Key("pk_test_xxx", "sk_test_xxx")
+```rust
 
-  encryptiondData = []byte(`{		
-		"rsa_public_key": "` + rsa_public_key + `",
-		"rsa_id":  "` + rsa_id + `"
-	}`)
-}
+const skey : &'static str = "sk_live_34a07dcb6d4c7e39";
+const pkey : &'static str = "pk_live_889113cd74ecfc55";
+
 ```
 
 ## Encriptar payload
@@ -61,11 +56,26 @@ Luego declara en variables el id RSA y llave RSA en tu backend, y envialo en las
 
 Ejemplo
 
-```go
-rsa_public_key := "la llave pública RSA";
-rsa_id := "el id de tu llave"
+```rust 
 
-_, res, err := culqi.CreateToken(jsonData, encryptiondData...)
+const rsaid : &'static str = "508fc232-0a9d-4fc0-a192-364a0b782b89";
+const CULQI_RSA_KEY: &'static str = "-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYp0451xITpczkBrl5Goxkh7m1
+oynj8eDHypIn7HmbyoNJd8cS4OsT850hIDBwYmFuwmxF1YAJS8Cd2nes7fjCHh+7
+oNqgNKxM2P2NLaeo4Uz6n9Lu4KKSxTiIT7BHiSryC0+Dic91XLH7ZTzrfryxigsc
++ZNndv0fQLOW2i6OhwIDAQAB
+-----END PUBLIC KEY-----";
+
+ let body = "{\"card_number\":\"4111111111111111\",\"cvv\":\"123\",\"expiration_month\":\"09\",\"expiration_year\":\"2025\",\"email\":\"alexis.pumayalla@culqi.com\",\"metadata\":{\"coment\":\"Tarjeta de prueba alexis\"}}";
+
+
+        match createEncrypt(body, "tokens") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ## Servicios
@@ -87,8 +97,14 @@ Crear un cargo significa cobrar una venta a una tarjeta. Para esto previamente d
 
 Los cargos pueden ser creados vía [API de devolución](https://apidocs.culqi.com/#tag/Cargos/operation/crear-cargo).
 
-```go
-statusCode, res, err := culqi.CreateCharge(json)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ### Crear devolución
@@ -97,8 +113,14 @@ Solicita la devolución de las compras de tus clientes (parcial o total) de form
 
 Las devoluciones pueden ser creados vía [API de devolución](https://apidocs.culqi.com/#tag/Devoluciones/operation/crear-devolucion).
 
-```go
-statusCode, res, err := culqi.CreateRefund(json)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ### Crear un Cliente (customer)
@@ -107,8 +129,14 @@ El **cliente** es un servicio que te permite guardar la información de tus clie
 
 Los clientes pueden ser creados vía [API de cliente](https://apidocs.culqi.com/#tag/Clientes/operation/crear-cliente).
 
-```go
-statusCode, res, err := culqi.CreateCustomer(json)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ### Crear una tarjeta (card)
@@ -117,8 +145,14 @@ La **tarjeta** es un servicio que te permite guardar la información de las tarj
 
 Las tarjetas pueden ser creadas vía [API de tarjeta](https://apidocs.culqi.com/#tag/Tarjetas/operation/crear-tarjeta).
 
-```go
-statusCode, res, err := culqi.CreateCard(json)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 
@@ -128,8 +162,14 @@ El plan es un servicio que te permite definir con qué frecuencia deseas realiza
 
 Un plan define el comportamiento de las suscripciones. Los planes pueden ser creados vía el [API de Plan](https://apidocs.culqi.com/#/planes#create) o desde el **CulqiPanel**.
 
-```go
-statusCode, res, err := culqi.CreatePlan(jsonDataPlan)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 
@@ -139,8 +179,14 @@ La suscripción es un servicio que asocia la tarjeta de un cliente con un plan e
 
 Las suscripciones pueden ser creadas vía [API de suscripción](https://apidocs.culqi.com/#tag/Suscripciones/operation/crear-suscripcion).
 
-```go
-statusCode, res, err := culqi.CreateSubscription(jsonData)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 
@@ -151,8 +197,14 @@ La orden contiene la información necesaria para la venta y es usado por el sist
 
 Las órdenes pueden ser creadas vía [API de orden](https://apidocs.culqi.com/#tag/Ordenes/operation/crear-orden).
 
-```go
-statusCode, res, err := culqi.CreateOrder(jsonData)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 
 ```
 
@@ -160,7 +212,7 @@ statusCode, res, err := culqi.CreateOrder(jsonData)
 ## Pruebas
 
 ```bash
-$ go test -v ./test/ -public_key=pk_test_xxx -secret_key=sk_test_xxx
+$ cargo test
 ```
 
 ---
