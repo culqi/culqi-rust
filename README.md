@@ -1,38 +1,7 @@
-culqi-rust
-==========
-
-[![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/marti1125/culqi-rust/blob/master/LICENSE)
-[![Crates.io](https://img.shields.io/crates/v/culqi.svg)](https://crates.io/crates/culqi)
-
-[Culqi API](https://www.culqi.com/api/#/) - [Rust](https://www.rust-lang.org/)
-
-### Usage
-
-Put this in your `Cargo.toml`:
-
-```toml
-[dependencies]
-culqi = "0.2.1"
-```
-
-And this in your crate root:
-
-```rust
-extern crate culqi;
-```
-
-[An example with Rocket.rs](https://github.com/marti1125/culqi-rust-example)
-
-### Instructions for Generate Doc
-
-```bash
-cargo rustdoc --lib
-```
-
 # Culqi-Rust
 
-[![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/marti1125/culqi-rust/blob/master/LICENSE)
-[![Crates.io](https://img.shields.io/crates/v/culqi.svg)](https://crates.io/crates/culqi)
+[![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/culqi/culqi_rust/blob/master/LICENSE)
+[![Crates.io](https://img.shields.io/crates/v/culqi.svg)](https://crates.io/crates/culqi_rust)
 
 
 Nuestra Biblioteca Rust oficial, es compatible con la v2.0 del Culqi API, con el cual tendrás la posibilidad de realizar cobros con tarjetas de débito y crédito, Yape, PagoEfectivo, billeteras móviles y Cuotéalo con solo unos simples pasos de configuración.
@@ -60,33 +29,11 @@ Nuestra biblioteca te da la posibilidad de capturar el `status_code` de la solic
 
 ## Instalación
 
+Agregar la siguiente dependencia en tu arhivo `Cargo.toml`:
 
-### Vía "go get"
-
-Ejecuta los siguientes comandos:
-
-```bash
-go get github.com/culqi/culqi-go
-go get "github.com/google/uuid"
-```
-
-
-### Manualmente
-
-Clonar el repositorio o descargarse el código fuente.
-
-```bash
-$ git clone git@github.com:culqi/culqi-go.git
-```
-
-## Inicio rápido
-
-Importando culqi-go:
-
-```go
-import (    
-    culqi "github.com/culqi/culqi-go"
-)
+```toml
+[dependencies]
+culqi = "0.0.1"
 ```
 
 ## Configuración

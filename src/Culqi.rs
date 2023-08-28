@@ -259,28 +259,3 @@ pub fn delete(
     let response_text = response.text()?;
     Ok(response_text)
 }
-
-pub fn update(
-    action : &str,
-    query: &str,
-    body: &str
-) -> Result<String, isahc::Error> {
-
-
-
-    let key: &str;
-    let url: String;
-
-    key = skey;
-    url = BASEURL.to_owned() + action + "/" + query;
-
-    let request = isahc::Request::patch(url)
-        .header("Content-Type", "application/json")
-        .header("Authorization", "Bearer ".to_owned() + key)
-        .body(body)?
-        send()?;
-
-    let mut response = isahc::send(request)?;
-    let response_text = response.text()?;
-    Ok(response_text)
-}
