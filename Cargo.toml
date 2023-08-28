@@ -1,7 +1,16 @@
 [package]
-name = "RustCulqiLib"
-version = "0.1.0"
-edition = "2021"
+name = "culqi_rust"
+version = "1.0.0"
+edition = "2023"
+description = "API bindings for the Culqi v2 HTTP API"
+authors = ["Team Culqi"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/culqi/culqi-rust"
+documentation = "https://docs.rs/culqi/0.1.0/culqi_rust/"
+keywords = ["culqi", "v2", "api"]
+categories = ["api-bindings"]
+exclude = ["src/main.rs", "examples/new_charge.rs"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
