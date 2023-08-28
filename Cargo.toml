@@ -1,7 +1,7 @@
 [package]
 name = "culqi_rust"
 version = "1.0.0"
-edition = "2023"
+edition = "2021"
 description = "API bindings for the Culqi v2 HTTP API"
 authors = ["Team Culqi"]
 license = "MIT"
