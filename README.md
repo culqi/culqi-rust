@@ -87,8 +87,14 @@ Lo recomendable es generar los 'tokens' con [Culqi Checkout v4](https://docs.cul
 
 > Recuerda que cuando interactúas directamente con el [API Token](https://apidocs.culqi.com/#tag/Tokens/operation/crear-token) necesitas cumplir la normativa de PCI DSS 3.2. Por ello, te pedimos que llenes el [formulario SAQ-D](https://listings.pcisecuritystandards.org/documents/SAQ_D_v3_Merchant.pdf) y lo envíes al buzón de riesgos Culqi.
 
-```go
-statusCode, res, err := culqi.CreateToken(jsonData)
+```rust
+ match create(body, "tokens") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ### Crear un cargo
@@ -114,7 +120,7 @@ Solicita la devolución de las compras de tus clientes (parcial o total) de form
 Las devoluciones pueden ser creados vía [API de devolución](https://apidocs.culqi.com/#tag/Devoluciones/operation/crear-devolucion).
 
 ```rust
- match create(body, "charges") {
+ match create(body, "refunds") {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
@@ -130,7 +136,7 @@ El **cliente** es un servicio que te permite guardar la información de tus clie
 Los clientes pueden ser creados vía [API de cliente](https://apidocs.culqi.com/#tag/Clientes/operation/crear-cliente).
 
 ```rust
- match create(body, "charges") {
+ match create(body, "customers") {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
@@ -146,7 +152,7 @@ La **tarjeta** es un servicio que te permite guardar la información de las tarj
 Las tarjetas pueden ser creadas vía [API de tarjeta](https://apidocs.culqi.com/#tag/Tarjetas/operation/crear-tarjeta).
 
 ```rust
- match create(body, "charges") {
+ match create(body, "cards") {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
@@ -163,7 +169,7 @@ El plan es un servicio que te permite definir con qué frecuencia deseas realiza
 Un plan define el comportamiento de las suscripciones. Los planes pueden ser creados vía el [API de Plan](https://apidocs.culqi.com/#/planes#create) o desde el **CulqiPanel**.
 
 ```rust
- match create(body, "charges") {
+ match create(body, "plans") {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
@@ -180,7 +186,7 @@ La suscripción es un servicio que asocia la tarjeta de un cliente con un plan e
 Las suscripciones pueden ser creadas vía [API de suscripción](https://apidocs.culqi.com/#tag/Suscripciones/operation/crear-suscripcion).
 
 ```rust
- match create(body, "charges") {
+ match create(body, "subscriptions") {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
@@ -198,7 +204,7 @@ La orden contiene la información necesaria para la venta y es usado por el sist
 Las órdenes pueden ser creadas vía [API de orden](https://apidocs.culqi.com/#tag/Ordenes/operation/crear-orden).
 
 ```rust
- match create(body, "charges") {
+ match create(body, "orders") {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
@@ -221,7 +227,7 @@ $ cargo test
 
 - [Referencia de Documentación](https://docs.culqi.com/)
 - [Referencia de API](https://apidocs.culqi.com/)
-- [Demo Checkout V4 + Culqi 3DS](https://github.com/culqi/culqi-go-demo-checkoutv4-culqi3ds)
+- [Demo Checkout V4 + Culqi 3DS]([https://github.com/culqi/culqi-go-demo-checkoutv4-culqi3ds](https://github.com/culqi/culqi-rust-demo-checkoutv4-culqi3ds))
 - [Wiki](https://github.com/culqi/culqi-go/wiki)
 
 ## Changelog
