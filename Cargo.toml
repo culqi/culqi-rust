@@ -1,6 +1,6 @@
 [package]
-name = "culqi_rust"
-version = "1.0.0"
+name = "LibCulqi"
+version = "1.0.1"
 edition = "2021"
 description = "API bindings for the Culqi v2 HTTP API"
 authors = ["Team Culqi"]
@@ -15,9 +15,8 @@ exclude = ["src/main.rs", "examples/new_charge.rs"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = "0.10"
+reqwest = "0.11"
 tokio = { version = "1", features = ["full"] }
-isahc = "1.7"
 aes-gcm = "0.9.3"
 rand = "0.8.4"
 base64 = "0.13.0"
