@@ -11,7 +11,7 @@ use std::fmt;
 use serde_json::{Value};
 use std::io::Error as IoError;
 use std::string::FromUtf8Error;
-use rsa::{PublicKey};
+//use rsa::{PublicKey};
 use openssl::hash::MessageDigest;
 use openssl::encrypt::{Encrypter};
 
@@ -97,7 +97,7 @@ impl From<DecodeError> for MyError {
 }
 
 
-pub fn encrypt(data: &str, publicKey: &str, is_json: bool) -> Result<HashMap<String, String>, MyError> {
+pub fn encrypt(data: &str, rsa_public_key: &str, is_json: bool) -> Result<HashMap<String, String>, MyError> {
 
 
     let json_data: Value = if is_json {
@@ -118,7 +118,7 @@ pub fn encrypt(data: &str, publicKey: &str, is_json: bool) -> Result<HashMap<Str
     let nonce = GenericArray::from_slice(&iv);
 
     // The data to be encrypted
-    let mut plaintext = serde_json::to_string(&json_data)?.as_bytes().to_vec();
+    let plaintext = serde_json::to_string(&json_data)?.as_bytes().to_vec();
 
     // Perform encryption
     let mut ciphertext = cipher.encrypt(nonce, &plaintext[..])?;
@@ -130,7 +130,7 @@ pub fn encrypt(data: &str, publicKey: &str, is_json: bool) -> Result<HashMap<Str
 
 
 
-    let public_key = Rsa::public_key_from_pem(publicKey.as_bytes()).unwrap();
+    let public_key = Rsa::public_key_from_pem(rsa_public_key.as_bytes()).unwrap();
     let public_key = PKey::from_rsa(public_key).unwrap();
 
 
