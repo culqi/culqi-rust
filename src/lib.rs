@@ -190,6 +190,7 @@ mod tests {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
+                assert_eq!(status_code, 201, "Expected status code 201");
             }
             Err(err) => println!("Error: {:?}", err),
         }
@@ -218,6 +219,7 @@ mod tests {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
+                assert_eq!(status_code, 201, "Expected status code 201");
             }
             Err(err) => println!("Error: {:?}", err),
         }
@@ -242,6 +244,7 @@ HiuTfpBl6HpD6+02SQIDAQAB
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
+                assert_eq!(status_code, 201, "Expected status code 201");
             }
             Err(err) => println!("Error: {:?}", err),
         }
