@@ -36,7 +36,6 @@ Agregar la siguiente dependencia en tu arhivo `Cargo.toml`:
 culqi = "0.0.1"
 ```
 
-
 En caso de usar linux ejecutar los siguiente comandos:
 
 ```bash
