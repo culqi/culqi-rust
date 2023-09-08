@@ -215,6 +215,7 @@ Las órdenes pueden ser creadas vía [API de orden](https://apidocs.culqi.com/#t
 
 ```bash
 $ cargo test
+$ cargo test tests::test_token_encrypt
 ```
 
 ---
