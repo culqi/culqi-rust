@@ -60,6 +60,7 @@ pub async fn createEncrypt(
     pkey: &str,
     skey: &str,
     rsa_key: &str,
+    rsa_id: &str,
 ) -> Result<(String, u16), Box<dyn Error>> {
     const SECURE_URL: &str = "https://secure.culqi.com/v2/tokens";
     const BASE_URL: &str = "https://api.culqi.com/v2/";
@@ -84,10 +85,12 @@ pub async fn createEncrypt(
     println!("key: {:?}", key);
 
     let client = reqwest::Client::new();
-
+     //"x-culqi-rsa-id" => rsa_id
     let mut headers = HeaderMap::new();
     headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
     headers.insert(AUTHORIZATION, ("Bearer ".to_owned() + key).parse().unwrap());
+    headers.insert("x-culqi-rsa-id", (rsa_id).parse().unwrap());
+
     // Añade aquí cualquier otro encabezado que necesites
 
     let response = client.post(&url)
@@ -227,8 +230,9 @@ mod tests {
         let sk = "INSERTE_SU_LLAVE_PRIVADA";
         let pk = "INSERTE_SU_LLAVE_PUBLICA";
         let rsa_key = "INSERTE_SU_LLAVE_RSA";
+        let rsa_id = "INSERTE_SU_RSA_ID";
 
-        match createEncrypt(body, "tokens", pk, sk, rsa_key).await  {
+        match createEncrypt(body, "tokens", pk, sk, rsa_key, rsa_id).await  {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
