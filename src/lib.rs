@@ -227,16 +227,16 @@ mod tests {
     async fn test_tokenEncrypt() {
         // Ejemplo de cómo usar la función
         let body = "{\"card_number\":\"4111111111111111\",\"cvv\":\"123\",\"expiration_month\":\"09\",\"expiration_year\":\"2025\",\"email\":\"alexis.pumayalla@culqi.com\",\"metadata\":{\"coment\":\"Tarjeta de prueba alexis\"}}";
-        let sk = "sk_test_1573b0e8079863ff";
-        let pk = "pk_test_90667d0a57d45c48";
+        let sk = "sk_test_c2267b5b262745f0";
+        let pk = "pk_test_e94078b9b248675d";
         let rsa_key = "-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9hD00BnivDj73/1SKZw5AyQvw
-FpvR/DKzW7Jqg1iwFWXrX6k1r57qZJH2wF1tZ9T3wTyw1we6BYgwPNRVC1IXe+E8
-B6xAWG8ta7BCZK/a6IFL+l9Q9BhkHBeVTD7qGEfCjhnB7QtyrTQwmytoNBKk1Tl7
-kbz8NO7jeiUxkZm75wIDAQAB
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDswQycch0x/7GZ0oFojkWCYv+g
+r5CyfBKXc3Izq+btIEMCrkDrIsz4Lnl5E3FSD7/htFn1oE84SaDKl5DgbNoev3pM
+C7MDDgdCFrHODOp7aXwjG8NaiCbiymyBglXyEN28hLvgHpvZmAn6KFo0lMGuKnz8
+HiuTfpBl6HpD6+02SQIDAQAB
 -----END PUBLIC KEY-----";
 
-        let rsa_id = "2ab335ad-c40d-4375-8dad-3ea315de23b0";
+        let rsa_id = "de35e120-e297-4b96-97ef-10a43423ddec";
 
         match createEncrypt(body, "tokens", pk, sk, rsa_key, rsa_id).await  {
             Ok((response_text, status_code)) => {
