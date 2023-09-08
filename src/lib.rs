@@ -170,7 +170,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_token() {
+    async fn test_token_create() {
         // Ejemplo de cómo usar la función
         let body = r#"{
             "card_number": "4111111111111111",
@@ -196,7 +196,7 @@ mod tests {
         }
     }
     #[tokio::test]
-    async fn test_create() {
+    async fn test_cargo_create() {
         // Ejemplo de cómo usar la función
         let body = r#"{
             "amount": 600,
@@ -226,7 +226,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_tokenEncrypt() {
+    async fn test_token_encrypt() {
         // Ejemplo de cómo usar la función
         let body = "{\"card_number\":\"4111111111111111\",\"cvv\":\"123\",\"expiration_month\":\"09\",\"expiration_year\":\"2025\",\"email\":\"alexis.pumayalla@culqi.com\",\"metadata\":{\"coment\":\"Tarjeta de prueba alexis\"}}";
         let sk = "sk_test_c2267b5b262745f0";
