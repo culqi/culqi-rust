@@ -230,6 +230,7 @@ mod tests {
         let sk = "INSERTE_SU_LLAVE_PRIVADA";
         let pk = "INSERTE_SU_LLAVE_PUBLICA";
         let rsa_key = "INSERTE_SU_LLAVE_RSA";
+
         let rsa_id = "INSERTE_SU_RSA_ID";
 
         match createEncrypt(body, "tokens", pk, sk, rsa_key, rsa_id).await  {
