@@ -1,5 +1,7 @@
 use std::error::Error;
 use reqwest::{Client, RequestBuilder};
+mod encrypt;
+use encrypt::encrypt;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
@@ -48,18 +50,23 @@ pub async fn create(
     Ok((response_text, status_code))
 }
 
-pub fn createEncrypt(
-    body: &str,
-    action : &str
-) -> Result<(String, u16), MyError> {
+use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
+use serde_json::json;
 
-    let body_encrypt = match encrypt(body, CULQI_RSA_KEY, true) {
-        Ok(result) => result,
-        Err(err) => return Err(MyError::from(err)), // Aquí simplemente retornamos el error original
-    };
+
+pub async fn createEncrypt(
+    body: &str,
+    action: &str,
+    pkey: &str,
+    skey: &str,
+    rsa_key: &str,
+) -> Result<(String, u16), Box<dyn Error>> {
+    const SECURE_URL: &str = "https://secure.culqi.com/v2/tokens";
+    const BASE_URL: &str = "https://api.culqi.com/v2/";
+
+    let body_encrypt = encrypt(body, rsa_key, true)?;
 
     println!("body_encrypt: {:?}", body_encrypt);
-
 
     let key: &str;
     let url: String;
@@ -68,74 +75,86 @@ pub fn createEncrypt(
 
     if action == "tokens" {
         key = pkey;
-        url = SECUREURL.to_string();
+        url = SECURE_URL.to_string();
     } else {
         key = skey;
-        url = BASEURL.to_owned() + action;
+        url = BASE_URL.to_owned() + action;
     }
-    println!("key: {:?}", key);
-    let mut response = isahc::Request::post(url)
-        .header("Content-Type", "application/json")
-        .header("Authorization", "Bearer ".to_owned() + key)
-        .header("x-culqi-rsa-id", rsaid)
-        //.headers(headers)
-        .body(serde_json::to_string(&body_encrypt).unwrap())?
-        .send()?;
 
+    println!("key: {:?}", key);
+
+    let client = reqwest::Client::new();
+
+    let mut headers = HeaderMap::new();
+    headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+    headers.insert(AUTHORIZATION, ("Bearer ".to_owned() + key).parse().unwrap());
+    // Añade aquí cualquier otro encabezado que necesites
+
+    let response = client.post(&url)
+        .headers(headers)
+        .body(serde_json::to_string(&body_encrypt).unwrap())
+        .send()
+        .await?;
 
     let status_code = response.status().as_u16();
-    let response_text = response.text()?;
+    let response_text = response.text().await?;
 
     Ok((response_text, status_code))
 }
 
-
-
-pub fn get(
-    action : &str,
-    query: &str
-) -> Result<String, isahc::Error> {
-
-
-
+pub async fn get(
+    action: &str,
+    query: &str,
+    skey: &str,
+) -> Result<String, reqwest::Error> {
     let key: &str;
     let url: String;
+    const SECURE_URL: &str = "https://secure.culqi.com/v2/tokens";
+    const BASE_URL: &str = "https://api.culqi.com/v2/";
 
     key = skey;
-    url = BASEURL.to_owned() + action + "/" + query;
+    url = BASE_URL.to_owned() + action + "/" + query;
 
-    let request = isahc::Request::get(url)
-        .header("Content-Type", "application/json")
-        .header("Authorization", "Bearer ".to_owned() + key)
-        .body(()) // No se envía un cuerpo en una solicitud GET
-        .unwrap();
+    let client = reqwest::Client::new();
 
-    let mut response = isahc::send(request)?;
-    let response_text = response.text()?;
+    let response = client.get(&url)
+        .header(CONTENT_TYPE, "application/json")
+        .header(AUTHORIZATION, format!("Bearer {}", key))
+        .send()
+        .await?;
+
+    let response_text = response.text().await?;
+
     Ok(response_text)
 }
 
-pub fn delete(
-    action : &str,
-    query: &str
-) -> Result<String, isahc::Error> {
-
+pub async fn delete(
+    action: &str,
+    query: &str,
+    skey: &str,
+) -> Result<String, reqwest::Error> {
     let key: &str;
     let url: String;
 
-    key = skey;
-    url = BASEURL.to_owned() + action + "/" + query;
+    const SECURE_URL: &str = "https://secure.culqi.com/v2/tokens";
+    const BASE_URL: &str = "https://api.culqi.com/v2/";
 
-    let request = isahc::Request::delete(url)
-        .header("Content-Type", "application/json")
-        .header("Authorization", "Bearer ".to_owned() + key)
-        .body(()) // No se envía un cuerpo en una solicitud GET
-        .unwrap();
+    key = skey; // Asegúrate de definir skey
+    url = BASE_URL.to_owned() + action + "/" + query; // Asegúrate de definir BASEURL
 
-    let mut response = isahc::send(request)?;
-    let response_text = response.text()?;
+    let client = reqwest::Client::new();
+
+    let response = client.delete(&url)
+        .header(CONTENT_TYPE, "application/json")
+        .header(AUTHORIZATION, format!("Bearer {}", key))
+        .send()
+        .await?;
+
+    let response_text = response.text().await?;
+
     Ok(response_text)
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -161,12 +180,86 @@ mod tests {
             }
         }"#;
 
-        match create(body, "tokens").await {
+        let sk = "sk_test_1573b0e8079863ff";
+        let pk = "pk_test_90667d0a57d45c48";
+
+        match create(body, "tokens", pk, sk).await {
             Ok((response_text, status_code)) => {
                 println!("Status Code: {}", status_code);
                 println!("Response Text: {}", response_text);
             }
             Err(err) => println!("Error: {:?}", err),
+        }
+    }
+    #[tokio::test]
+    async fn test_create() {
+        // Ejemplo de cómo usar la función
+        let body = r#"{
+            "amount": 600,
+            "currency_code": "PEN",
+            "email": "review@culqi.com",
+            "source_id": "tkn_test_IctezQFcWKhvOHyQ",
+            "antifraud_details": {
+                "first_name": "Fernando",
+                "last_name": "Chullo",
+                "email": "review134@culqi.com",
+                "phone_number": "945737476",
+                "device_finger_print_id": "8b17f1dc-e616-46cf-b416-ec7ef63730e9"
+            }
+        }"#;
+
+        let sk = "sk_test_1573b0e8079863ff";
+        let pk = "pk_test_90667d0a57d45c48";
+
+        match create(body, "charges", pk, sk).await {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_tokenEncrypt() {
+        // Ejemplo de cómo usar la función
+        let body = "{\"card_number\":\"4111111111111111\",\"cvv\":\"123\",\"expiration_month\":\"09\",\"expiration_year\":\"2025\",\"email\":\"alexis.pumayalla@culqi.com\",\"metadata\":{\"coment\":\"Tarjeta de prueba alexis\"}}";
+        let sk = "sk_test_1573b0e8079863ff";
+        let pk = "pk_test_90667d0a57d45c48";
+        let rsa_key = "-----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYp0451xITpczkBrl5Goxkh7m1
+        oynj8eDHypIn7HmbyoNJd8cS4OsT850hIDBwYmFuwmxF1YAJS8Cd2nes7fjCHh+7
+        oNqgNKxM2P2NLaeo4Uz6n9Lu4KKSxTiIT7BHiSryC0+Dic91XLH7ZTzrfryxigsc
+        +ZNndv0fQLOW2i6OhwIDAQAB
+        -----END PUBLIC KEY-----";
+
+        match createEncrypt(body, "tokens", pk, sk, rsa_key).await  {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_token_get() {
+
+        let sk = "sk_test_1573b0e8079863ff";
+
+        match get("tokens", "tkn_test_20HjpSkdDlSdoHEC", sk).await {
+            Ok(response_text) => println!("Respuesta del servidor: {}", response_text),
+            Err(e) => eprintln!("Error: {}", e),
+        }
+    }
+    #[tokio::test]
+    async fn test_order_delete() {
+
+        let sk = "sk_test_1573b0e8079863ff";
+
+        match delete("tokens", "ord_test_20HjpSkdDlSdoHEC", sk).await {
+            Ok(response_text) => println!("Respuesta del servidor: {}", response_text),
+            Err(e) => eprintln!("Error: {}", e),
         }
     }
 }
