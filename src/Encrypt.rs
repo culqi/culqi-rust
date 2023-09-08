@@ -79,11 +79,6 @@ impl From<openssl::error::ErrorStack> for MyError {
     }
 }
 
-impl From<isahc::Error> for MyError {
-    fn from(err: isahc::Error) -> MyError {
-        MyError::Other(err.to_string())
-    }
-}
 
 // Add this implementation
 impl From<serde_json::Error> for MyError {
@@ -92,11 +87,6 @@ impl From<serde_json::Error> for MyError {
     }
 }
 
-impl From<isahc::http::Error> for MyError {
-    fn from(err: isahc::http::Error) -> MyError {
-        MyError::Other(err.to_string())
-    }
-}
 
 impl From<DecodeError> for MyError {
     fn from(error: DecodeError) -> Self {
