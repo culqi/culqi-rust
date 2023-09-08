@@ -36,6 +36,14 @@ Agregar la siguiente dependencia en tu arhivo `Cargo.toml`:
 culqi = "0.0.1"
 ```
 
+
+En caso de usar linux ejecutar los siguiente comandos:
+
+```bash
+sudo apt install libssl-dev
+sudo apt install pkg-config
+```
+
 ## Configuración
 
 Para empezar a enviar peticiones al API de Culqi debes configurar tu llave pública (pk), llave privada (sk).
