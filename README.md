@@ -48,10 +48,11 @@ sudo apt install pkg-config
 Para empezar a enviar peticiones al API de Culqi debes configurar tu llave pública (pk), llave privada (sk).
 Para habilitar encriptación de payload debes configurar tu rsa_id y rsa_public_key.
 
-```rust
+En el archivo /src/lib.rs podemo configurar nuestras llaves.
 
-const skey : &'static str = "sk_live_34a07dcb6d4c7e39";
-const pkey : &'static str = "pk_live_889113cd74ecfc55";
+```rust
+const pkey : &'static str = "Ingresa tu llave pública";
+const skey : &'static str = "Ingresa tu llave privada";
 
 ```
 
@@ -65,13 +66,8 @@ Ejemplo
 
 ```rust 
 
-const rsaid : &'static str = "508fc232-0a9d-4fc0-a192-364a0b782b89";
-const CULQI_RSA_KEY: &'static str = "-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYp0451xITpczkBrl5Goxkh7m1
-oynj8eDHypIn7HmbyoNJd8cS4OsT850hIDBwYmFuwmxF1YAJS8Cd2nes7fjCHh+7
-oNqgNKxM2P2NLaeo4Uz6n9Lu4KKSxTiIT7BHiSryC0+Dic91XLH7ZTzrfryxigsc
-+ZNndv0fQLOW2i6OhwIDAQAB
------END PUBLIC KEY-----";
+const rsaid : &'static str = "Ingresa tu RSA id";
+const CULQI_RSA_KEY: &'static str = "Ingresa tu RSA public key";
 
  let body = "{\"card_number\":\"4111111111111111\",\"cvv\":\"123\",\"expiration_month\":\"09\",\"expiration_year\":\"2025\",\"email\":\"alexis.pumayalla@culqi.com\",\"metadata\":{\"coment\":\"Tarjeta de prueba alexis\"}}";
 
@@ -94,7 +90,7 @@ Lo recomendable es generar los 'tokens' con [Culqi Checkout v4](https://docs.cul
 
 > Recuerda que cuando interactúas directamente con el [API Token](https://apidocs.culqi.com/#tag/Tokens/operation/crear-token) necesitas cumplir la normativa de PCI DSS 3.2. Por ello, te pedimos que llenes el [formulario SAQ-D](https://listings.pcisecuritystandards.org/documents/SAQ_D_v3_Merchant.pdf) y lo envíes al buzón de riesgos Culqi.
 
-```go
+```rust
 statusCode, res, err := culqi.CreateToken(jsonData)
 ```
 
