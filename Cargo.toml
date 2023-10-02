@@ -1,6 +1,6 @@
 [package]
-name = "LibCulqi"
-version = "1.0.1"
+name = "LibCulqi28"
+version = "0.0.1"
 edition = "2021"
 description = "API bindings for the Culqi v2 HTTP API"
 authors = ["Team Culqi"]
@@ -10,9 +10,11 @@ repository = "https://github.com/culqi/culqi-rust"
 documentation = "https://docs.rs/culqi/0.1.0/culqi_rust/"
 keywords = ["culqi", "v2", "api"]
 categories = ["api-bindings"]
-exclude = ["src/main.rs", "examples/new_charge.rs"]
+exclude = ["src/main.rs", "examples/new_charge.rs","tests/test.rs"]
+include = ["src/encrypt.rs", "src/lib.rs","src/token.rs"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 
 [dependencies]
 reqwest = "0.11"
@@ -30,4 +32,4 @@ x509-parser = "0.9.0"
 pkcs8 = "0.7"
 serde_json = "1.0.66"
 crypto = "0.5.1"
-
+client={path="../client"}
