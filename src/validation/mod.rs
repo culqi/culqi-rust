@@ -5,5 +5,7 @@ pub mod cardValidation;
 pub mod customerValidation;
 pub mod planValidation;
 pub mod refundValidation;
+pub mod subscriptionValidation;
+pub mod orderValidation;
 pub mod CustomException;
 pub mod validate_if_action;
