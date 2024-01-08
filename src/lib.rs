@@ -1,7 +1,12 @@
-use std::error::Error;
+use std::{error::Error, fmt::Debug};
 use reqwest::{Client, RequestBuilder};
 mod encrypt;
 use encrypt::encrypt;
+mod validation;
+use validation::helpers::Helpers;
+use validation::validate_if_action::ValidateIfAction;
+
+use anyhow::Result;
 
 const SECURE_URL: &str = "https://secure.culqi.com/v2/tokens";
 const BASE_URL: &str = "https://api.culqi.com/v2/";
@@ -34,13 +39,15 @@ pub async fn create(
     action: &str,
     pk: &str,
     sk: &str,
-) -> Result<(String, u16), reqwest::Error> {
+) -> Result<(String, u16)> {
     let skey: &str = sk;
     let pkey: &str = pk;
 
     let key: &str;
     let url: String;
 
+    
+    ValidateIfAction::validate_class(action, body)?;
     if action == "tokens" {
         key = pkey;
         url = SECURE_URL.to_string();
@@ -200,7 +207,7 @@ mod tests {
                 println!("Response Text: {}", response_text);
                 assert_eq!(status_code, 201, "Expected status code 201");
             }
-            Err(err) => println!("Error: {:?}", err),
+            Err(err) => println!("{:?}", err),
         }
     }
 
