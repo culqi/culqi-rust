@@ -3,6 +3,8 @@ use reqwest::{Client, RequestBuilder};
 mod encrypt;
 use encrypt::encrypt;
 mod validation;
+mod headers;
+use headers::CustomHeaders;
 use validation::helpers::Helpers;
 use validation::validate_if_action::ValidateIfAction;
 
@@ -51,11 +53,15 @@ pub async fn create(
         url = BASE_URL.to_owned() + action;
     }
 
+
+
     let client = Client::new();
+    let additional_headers = CustomHeaders::get_headers(key);
     let response = client
         .post(url)
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Bearer {}", key))
+        .headers(additional_headers)
         .body(body.to_owned()) // Clonar el contenido del body a un String propio
         .send()
         .await?;
@@ -105,10 +111,13 @@ pub async fn create_encrypt(
     headers.insert(AUTHORIZATION, ("Bearer ".to_owned() + key).parse().unwrap());
     headers.insert("x-culqi-rsa-id", (rsa_pid).parse().unwrap());
 
+    let additional_headers = CustomHeaders::get_headers(key);
+
     // Añade aquí cualquier otro encabezado que necesites
 
     let response = client.post(&url)
         .headers(headers)
+        .headers(additional_headers)
         .body(serde_json::to_string(&body_encrypt).unwrap())
         .send()
         .await?;
@@ -132,9 +141,12 @@ pub async fn get(
 
     let client = reqwest::Client::new();
 
+    let additional_headers = CustomHeaders::get_headers(key);
+
     let response = client.get(&url)
         .header(CONTENT_TYPE, "application/json")
         .header(AUTHORIZATION, format!("Bearer {}", key))
+        .headers(additional_headers)
         .send()
         .await?;
 
@@ -155,10 +167,12 @@ pub async fn delete(
     url = BASE_URL.to_owned() + action + "/" + query; // Asegúrate de definir BASEURL
 
     let client = reqwest::Client::new();
+    let additional_headers = CustomHeaders::get_headers(key);
 
     let response = client.delete(&url)
         .header(CONTENT_TYPE, "application/json")
         .header(AUTHORIZATION, format!("Bearer {}", key))
+        .headers(additional_headers)
         .send()
         .await?;
 
