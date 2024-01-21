@@ -1,38 +1,7 @@
-culqi-rust
-==========
-
-[![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/marti1125/culqi-rust/blob/master/LICENSE)
-[![Crates.io](https://img.shields.io/crates/v/culqi.svg)](https://crates.io/crates/culqi)
-
-[Culqi API](https://www.culqi.com/api/#/) - [Rust](https://www.rust-lang.org/)
-
-### Usage
-
-Put this in your `Cargo.toml`:
-
-```toml
-[dependencies]
-culqi = "0.2.1"
-```
-
-And this in your crate root:
-
-```rust
-extern crate culqi;
-```
-
-[An example with Rocket.rs](https://github.com/marti1125/culqi-rust-example)
-
-### Instructions for Generate Doc
-
-```bash
-cargo rustdoc --lib
-```
-
 # Culqi-Rust
 
-[![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/marti1125/culqi-rust/blob/master/LICENSE)
-[![Crates.io](https://img.shields.io/crates/v/culqi.svg)](https://crates.io/crates/culqi)
+[![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/culqi/culqi_rust/blob/master/LICENSE)
+[![Crates.io](https://img.shields.io/crates/v/culqi.svg)](https://crates.io/crates/culqi_rust)
 
 
 Nuestra Biblioteca Rust oficial, es compatible con la v2.0 del Culqi API, con el cual tendrás la posibilidad de realizar cobros con tarjetas de débito y crédito, Yape, PagoEfectivo, billeteras móviles y Cuotéalo con solo unos simples pasos de configuración.
@@ -46,7 +15,7 @@ Nuestra biblioteca te da la posibilidad de capturar el `status_code` de la solic
 
 ## Requisitos
 
-- Go 1.6+
+- Rust 1.6.2+
 * Afiliate [aquí](https://afiliate.culqi.com/).
 * Si vas a realizar pruebas obtén tus llaves desde [aquí](https://integ-panel.culqi.com/#/registro), si vas a realizar transacciones reales obtén tus llaves desde [aquí](https://panel.culqi.com/#/registro).
 
@@ -60,33 +29,18 @@ Nuestra biblioteca te da la posibilidad de capturar el `status_code` de la solic
 
 ## Instalación
 
+Agregar la siguiente dependencia en tu arhivo `Cargo.toml`:
 
-### Vía "go get"
-
-Ejecuta los siguientes comandos:
-
-```bash
-go get github.com/culqi/culqi-go
-go get "github.com/google/uuid"
+```toml
+[dependencies]
+culqi = "0.0.1"
 ```
 
-
-### Manualmente
-
-Clonar el repositorio o descargarse el código fuente.
+En caso de usar linux ejecutar los siguiente comandos:
 
 ```bash
-$ git clone git@github.com:culqi/culqi-go.git
-```
-
-## Inicio rápido
-
-Importando culqi-go:
-
-```go
-import (    
-    culqi "github.com/culqi/culqi-go"
-)
+sudo apt install libssl-dev
+sudo apt install pkg-config
 ```
 
 ## Configuración
@@ -94,16 +48,12 @@ import (
 Para empezar a enviar peticiones al API de Culqi debes configurar tu llave pública (pk), llave privada (sk).
 Para habilitar encriptación de payload debes configurar tu rsa_id y rsa_public_key.
 
-```go
-func main() {
-  // 1. llaves
-  culqi.Key("pk_test_xxx", "sk_test_xxx")
+En el archivo /src/lib.rs podemo configurar nuestras llaves.
 
-  encryptiondData = []byte(`{		
-		"rsa_public_key": "` + rsa_public_key + `",
-		"rsa_id":  "` + rsa_id + `"
-	}`)
-}
+```rust
+const pkey : &'static str = "Ingresa tu llave pública";
+const skey : &'static str = "Ingresa tu llave privada";
+
 ```
 
 ## Encriptar payload
@@ -114,11 +64,21 @@ Luego declara en variables el id RSA y llave RSA en tu backend, y envialo en las
 
 Ejemplo
 
-```go
-rsa_public_key := "la llave pública RSA";
-rsa_id := "el id de tu llave"
+```rust 
 
-_, res, err := culqi.CreateToken(jsonData, encryptiondData...)
+const rsaid : &'static str = "Ingresa tu RSA id";
+const CULQI_RSA_KEY: &'static str = "Ingresa tu RSA public key";
+
+ let body = "{\"card_number\":\"4111111111111111\",\"cvv\":\"123\",\"expiration_month\":\"09\",\"expiration_year\":\"2025\",\"email\":\"alexis.pumayalla@culqi.com\",\"metadata\":{\"coment\":\"Tarjeta de prueba alexis\"}}";
+
+
+        match createEncrypt(body, "tokens") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ## Servicios
@@ -130,7 +90,7 @@ Lo recomendable es generar los 'tokens' con [Culqi Checkout v4](https://docs.cul
 
 > Recuerda que cuando interactúas directamente con el [API Token](https://apidocs.culqi.com/#tag/Tokens/operation/crear-token) necesitas cumplir la normativa de PCI DSS 3.2. Por ello, te pedimos que llenes el [formulario SAQ-D](https://listings.pcisecuritystandards.org/documents/SAQ_D_v3_Merchant.pdf) y lo envíes al buzón de riesgos Culqi.
 
-```go
+```rust
 statusCode, res, err := culqi.CreateToken(jsonData)
 ```
 
@@ -140,8 +100,14 @@ Crear un cargo significa cobrar una venta a una tarjeta. Para esto previamente d
 
 Los cargos pueden ser creados vía [API de devolución](https://apidocs.culqi.com/#tag/Cargos/operation/crear-cargo).
 
-```go
-statusCode, res, err := culqi.CreateCharge(json)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ### Crear devolución
@@ -150,8 +116,14 @@ Solicita la devolución de las compras de tus clientes (parcial o total) de form
 
 Las devoluciones pueden ser creados vía [API de devolución](https://apidocs.culqi.com/#tag/Devoluciones/operation/crear-devolucion).
 
-```go
-statusCode, res, err := culqi.CreateRefund(json)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ### Crear un Cliente (customer)
@@ -160,8 +132,14 @@ El **cliente** es un servicio que te permite guardar la información de tus clie
 
 Los clientes pueden ser creados vía [API de cliente](https://apidocs.culqi.com/#tag/Clientes/operation/crear-cliente).
 
-```go
-statusCode, res, err := culqi.CreateCustomer(json)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 ### Crear una tarjeta (card)
@@ -170,8 +148,14 @@ La **tarjeta** es un servicio que te permite guardar la información de las tarj
 
 Las tarjetas pueden ser creadas vía [API de tarjeta](https://apidocs.culqi.com/#tag/Tarjetas/operation/crear-tarjeta).
 
-```go
-statusCode, res, err := culqi.CreateCard(json)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 
@@ -181,8 +165,14 @@ El plan es un servicio que te permite definir con qué frecuencia deseas realiza
 
 Un plan define el comportamiento de las suscripciones. Los planes pueden ser creados vía el [API de Plan](https://apidocs.culqi.com/#/planes#create) o desde el **CulqiPanel**.
 
-```go
-statusCode, res, err := culqi.CreatePlan(jsonDataPlan)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 
@@ -192,8 +182,14 @@ La suscripción es un servicio que asocia la tarjeta de un cliente con un plan e
 
 Las suscripciones pueden ser creadas vía [API de suscripción](https://apidocs.culqi.com/#tag/Suscripciones/operation/crear-suscripcion).
 
-```go
-statusCode, res, err := culqi.CreateSubscription(jsonData)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 ```
 
 
@@ -204,8 +200,14 @@ La orden contiene la información necesaria para la venta y es usado por el sist
 
 Las órdenes pueden ser creadas vía [API de orden](https://apidocs.culqi.com/#tag/Ordenes/operation/crear-orden).
 
-```go
-statusCode, res, err := culqi.CreateOrder(jsonData)
+```rust
+ match create(body, "charges") {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
 
 ```
 
@@ -213,7 +215,8 @@ statusCode, res, err := culqi.CreateOrder(jsonData)
 ## Pruebas
 
 ```bash
-$ go test -v ./test/ -public_key=pk_test_xxx -secret_key=sk_test_xxx
+$ cargo test
+$ cargo test tests::test_token_encrypt
 ```
 
 ---
@@ -235,4 +238,3 @@ Team Culqi
 
 ## Licencia
 El código fuente de culqi-python está distribuido bajo MIT License, revisar el archivo LICENSE.
-

@@ -1,26 +1,37 @@
 [package]
-name = "culqi"
-version = "0.2.1"
+name = "LibCulqi"
+version = "1.0.1"
+edition = "2021"
 description = "API bindings for the Culqi v2 HTTP API"
-authors = ["Willy Aguirre <marti1125@gmail.com>"]
+authors = ["Team Culqi"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/marti1125/culqi-rust"
-documentation = "https://docs.rs/culqi/0.2.1/culqi/"
+repository = "https://github.com/culqi/culqi-rust"
+documentation = "https://docs.rs/culqi/0.1.0/culqi_rust/"
 keywords = ["culqi", "v2", "api"]
 categories = ["api-bindings"]
 exclude = ["src/main.rs", "examples/new_charge.rs"]
 
-[lib]
-name = "culqi"
-doc = false
-path = "src/lib.rs"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hyper = "0.10"
-hyper-native-tls = "0.2.2"
-reqwest = "0.5.1"
-serde = "0.9"
-serde_json = "0.9"
-serde_derive = "0.9"
-serde_qs = "0.0.2"
+reqwest = "0.11"
+tokio = { version = "1", features = ["full"] }
+aes-gcm = "0.9.3"
+rand = "0.8.4"
+base64 = "0.13.0"
+rsa = "0.5.0"
+pem = "1.1.1"
+regex = "1.5.4"
+sha2 = "0.9.8"
+aes = "0.7.4"
+openssl = "0.10"
+x509-parser = "0.9.0"
+pkcs8 = "0.7"
+serde_json = "1.0.66"
+crypto = "0.5.1"
+chrono = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
+openssl-sys = { version = "0.9.51", features = ["vendored"] }
+
