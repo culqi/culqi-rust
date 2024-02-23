@@ -17,7 +17,7 @@ impl SubscriptionValidation {
         ];
         for field in &required_payload {
             if !body.contains(field) {
-                return Err(CustomException::new(&format!("El campo '{}' es requerido y no está presente", field)));
+                return Err(CustomException::new(&format!("El campo '{}' es requerido.", field)));
             }
         }
 
@@ -82,8 +82,7 @@ impl SubscriptionValidation {
         ];
         for field in &required_payload {
             if !body.contains(field) {
-                return Err(CustomException::new(&format!("Field '{}' is missing in the payload", field)));
-            }
+                return Err(CustomException::new(&format!("El campo '{}' es requerido.", field)));            }
         }
 
         if let Some(card_id) = json_data.get("card_id") {
