@@ -97,13 +97,9 @@ impl SubscriptionValidation {
 
         if body.contains("metadata") {
             match Helpers::validate_metadata(&json_data["metadata"]) {
-                Ok(()) => {
-                    // La validación fue exitosa, continúa con el código aquí
-                }
+                Ok(()) => {}
                 Err(err) => {
-                    // Manejar el error, por ejemplo, imprimir el mensaje de error
                     eprintln!("Error al validar metadata: {}", err);
-                    // También puedes devolver el error, lanzarlo, etc., según tus necesidades
                     return Err(err);
                 }
             }
@@ -121,7 +117,6 @@ impl SubscriptionValidation {
             }
         }
 
-        // Validate parameters status
         if let Some(status) = json_data.get("status") {
             let values_status = [1, 2, 3, 4, 5, 6, 8];
             if !status.is_i64() || !values_status.contains(&status.as_i64().unwrap()) {
@@ -129,35 +124,30 @@ impl SubscriptionValidation {
             }
         }
 
-         // Validate parameters creation_date_from
         if let Some(creation_date_from) = json_data.get("creation_date_from") {
             if !creation_date_from.is_string() || !(creation_date_from.as_str().unwrap().len() == 10 || creation_date_from.as_str().unwrap().len() == 13) {
                 return Err(CustomException::new("El campo 'creation_date_from' debe tener una longitud de 10 o 13 caracteres."));
             }
         }
 
-        // Validate parameters creation_date_to
         if let Some(creation_date_to) = json_data.get("creation_date_to") {
             if !creation_date_to.is_string() || !(creation_date_to.as_str().unwrap().len() == 10 || creation_date_to.as_str().unwrap().len() == 13) {
                 return Err(CustomException::new("El campo 'creation_date_to' debe tener una longitud de 10 o 13 caracteres."));
             }
         }
 
-        // Validate parameters before
         if let Some(before) = json_data.get("before") {
             if !before.is_string() || before.as_str().unwrap().len() != 25 {
                 return Err(CustomException::new("El campo 'before' es inválido. La longitud debe ser de 25 caracteres."));
             }
         }
 
-        // Validate parameters after
         if let Some(after) = json_data.get("after") {
             if !after.is_string() || after.as_str().unwrap().len() != 25 {
                 return Err(CustomException::new("El campo 'after' es inválido. La longitud debe ser de 25 caracteres."));
             }
         }
 
-        // Validate parameters limit
         if let Some(limit) = json_data.get("limit") {
             let range_limit = 1..=100;
             if !limit.is_i64() || !range_limit.contains(&limit.as_i64().unwrap()) {

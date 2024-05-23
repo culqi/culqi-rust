@@ -146,76 +146,34 @@ impl Helpers {
         let allowed_values = ["PEN", "USD"];
     
         if allowed_values.contains(&currency) {
-            Ok(())  // El valor está en la lista, no hay error
+            Ok(())
         } else {
-            // Si llega aquí, significa que el valor no está en la lista
             Err(CustomException::new(&format!("El campo 'currency' es inválido o está vacío, el código de la moneda en tres letras (Formato ISO 4217). Culqi actualmente soporta las siguientes monedas: {:?}", allowed_values)))
         }
     }
 
-    pub fn validate_currency(currency: &str, amount: i32) -> Result<(), CustomException> {
-        // Validar la moneda
-        Self::validate_enum_currency(currency)?;
-    
-        let min_amount_pen = 3 * 100;
-        let max_amount_pen = 5000 * 100;
-        let min_amount_usd = 1 * 100;
-        let max_amount_usd = 1500 * 100;
-    
-        let (min_amount_public_api, max_amount_public_api) = if currency == "USD" {
-            (min_amount_usd, max_amount_usd)
-        } else {
-            (min_amount_pen, max_amount_pen)
-        };
-    
-        let valid_amount = min_amount_public_api <= amount && amount <= max_amount_public_api;
-    
-        if !valid_amount {
-            return Err(CustomException::new(&format!(
-                "El campo 'amount' admite valores en el rango {} a {}.",
-                min_amount_public_api, max_amount_public_api
-            )));
-        }
-    
-        Ok(())
-    }
-    
-    pub fn validate_initial_cycles(has_initial_charge: bool, currency: &str, amount: i32, pay_amount: i32, count: i32) -> Result<(), CustomException> {
+    pub fn validate_initial_cycles(has_initial_charge: bool, currency: &str, count: i32) -> Result<(), CustomException> {
         if has_initial_charge {
-            Self::validate_currency(currency, amount)?;
-    
-            if amount == pay_amount {
-                return Err(CustomException::new("El campo 'initial_cycles.amount' es inválido o está vacío. El valor no debe ser igual al monto del plan."));
-            }
-    
+            Self::validate_enum_currency(currency)?;
+        
             if !(1 <= count && count <= 9999) {
                 return Err(CustomException::new("El campo 'initial_cycles.count' solo admite valores numéricos en el rango 1 a 9999."));
             }
     
-            if !(300 <= pay_amount && pay_amount <= 500000) {
-                return Err(CustomException::new("El campo 'initial_cycles.amount' solo admite valores numéricos en el rango 300 a 500000."));
-            }
         } else {
             if !(0 <= count && count <= 9999) {
                 return Err(CustomException::new("El campo 'initial_cycles.count' solo admite valores numéricos en el rango 0 a 9999."));
             }
-    
-            if pay_amount != 0 {
-                return Err(CustomException::new("El campo 'initial_cycles.amount' es inválido, debe ser 0."));
-            }
+
         }
     
         Ok(())
     }
 
     pub fn validate_image(image: &str) -> Result<(), CustomException> {
-        // Expresión regular para validar URLs
         let regex_image = r"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-zA-Z0-9]+([-.]{1}[a-zA-Z0-9]+)*\.[a-zA-Z]{2,5}(:[0-9]{1,5})?(\/.*)?$";
         let regex = Regex::new(&regex_image).map_err(|_| CustomException::new("Error en la expresión regular para validar la imagen."))?;
-    
-        // Verificar si 'image' es una cadena y cumple con los criterios de validación
         if !(image.len() >= 5 && image.len() <= 250 && regex.is_match(image)) {
-            // La imagen no cumple con los criterios de validación
             return Err(CustomException::new("El campo 'image' es inválido. Debe ser una cadena y una URL válida."));
         }
     
@@ -223,7 +181,6 @@ impl Helpers {
     }
     
     pub fn validate_metadata(metadata: &Value) -> Result<(), CustomException> {
-        // Permitir un diccionario vacío para el campo metadata
         if let Some(err) = Self::validate_key_and_value_length(metadata) {
             return Err(err);
         }
@@ -240,7 +197,6 @@ impl Helpers {
                 let key_str = key.to_string();
                 let value_str = value.to_string();
     
-                // Verificar límites de longitud de claves
                 if !(1 <= key_str.len() && key_str.len() <= max_key_length) ||
                    !(1 <= value_str.len() && value_str.len() <= max_value_length) {
                     let error_message = format!(
@@ -258,9 +214,7 @@ impl Helpers {
     }
 
     pub fn validate_id(id: &str, val: &str) -> Result<(), CustomException> {
-        // Permitir un diccionario vacío para el campo metadata
         if id.is_empty() || id.len() < 25 {
-            // Devuelve el error personalizado con un mensaje
             return Err(CustomException::new("El campo 'id' es inválido. La longitud debe ser de 25 caracteres."));
         }
 
