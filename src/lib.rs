@@ -12,7 +12,7 @@ use validation::validate_if_action::ValidateIfAction;
 use anyhow::Result;
 
 const SECURE_URL: &str = "https://secure.culqi.com/v2/tokens";
-const BASE_URL: &str = "https://qa-api.culqi.xyz/v2/";
+const BASE_URL: &str = "https://api.culqi.com/v2/";
 
 const PUBLIC_KEY: &str = "INSERTE_SU_LLAVE_PUBLICA";
 const SECRET_KEY: &str = "INSERTE_SU_LLAVE_PRIVADA";
