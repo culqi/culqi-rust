@@ -215,7 +215,26 @@ Las órdenes pueden ser creadas vía [API de orden](https://apidocs.culqi.com/#t
 ## Pruebas
 
 ```bash
-cargo test
-cargo test tests::test_token_encrypt
-cargo rustdoc --lib
+$ cargo test
+$ cargo test tests::test_token_encrypt
 ```
+
+---
+
+## Documentación
+
+- [Referencia de Documentación](https://docs.culqi.com/)
+- [Referencia de API](https://apidocs.culqi.com/)
+- [Demo Checkout V4 + Culqi 3DS](https://github.com/culqi/culqi-go-demo-checkoutv4-culqi3ds)
+- [Wiki](https://github.com/culqi/culqi-go/wiki)
+
+## Changelog
+
+Todos los cambios en las versiones de esta biblioteca están listados en
+[CHANGELOG](CHANGELOG).
+
+## Autor
+Team Culqi
+
+## Licencia
+El código fuente de culqi-python está distribuido bajo MIT License, revisar el archivo LICENSE.
