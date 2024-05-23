@@ -12,10 +12,10 @@ use validation::validate_if_action::ValidateIfAction;
 use anyhow::Result;
 
 const SECURE_URL: &str = "https://secure.culqi.com/v2/tokens";
-const BASE_URL: &str = "https://qa-api.culqi.xyz/v2/";
+const BASE_URL: &str = "https://api.culqi.com/v2/";
 
 const PUBLIC_KEY: &str = "pk_test_e94078b9b248675d";
-const SECRET_KEY: &str = "sk_live_c2eec44e937847f9";
+const SECRET_KEY: &str = "sk_test_c2267b5b262745f0";
 
 const RSA_ID: &str = "de35e120-e297-4b96-97ef-10a43423ddec";
 const RSA_KEY: &str = "-----BEGIN PUBLIC KEY-----
