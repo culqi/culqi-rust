@@ -25,6 +25,20 @@ C7MDDgdCFrHODOp7aXwjG8NaiCbiymyBglXyEN28hLvgHpvZmAn6KFo0lMGuKnz8
 HiuTfpBl6HpD6+02SQIDAQAB
 -----END PUBLIC KEY-----";
 
+const HEADERS : &str = r#"{
+    "charges": {
+        "X-Charge-Channel": "recurrent"
+    },
+    "plans": {
+      "X-Plan-Type": 1
+    },
+    "allow":{
+        "X-Header-Config": true
+    }
+}"#;
+
+//const HEADERS : &str = "";
+
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
@@ -66,7 +80,7 @@ pub async fn create(
 
 
     let client = Client::new();
-    let additional_headers = CustomHeaders::get_headers(key);
+    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
     let response = client
         .post(url)
         .header("Content-Type", "application/json")
@@ -114,7 +128,8 @@ pub async fn update(
 
 
     let client = Client::new();
-    let additional_headers = CustomHeaders::get_headers(key);
+    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
+
     let response = client
         .patch(url)
         .header("Content-Type", "application/json")
@@ -169,7 +184,7 @@ pub async fn create_encrypt(
     headers.insert(AUTHORIZATION, ("Bearer ".to_owned() + key).parse().unwrap());
     headers.insert("x-culqi-rsa-id", (rsa_pid).parse().unwrap());
 
-    let additional_headers = CustomHeaders::get_headers(key);
+    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
 
     // Añade aquí cualquier otro encabezado que necesites
 
@@ -203,7 +218,7 @@ pub async fn get(
 
     let client = reqwest::Client::new();
 
-    let additional_headers = CustomHeaders::get_headers(key);
+    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
 
     let response = client.get(&url)
         .header(CONTENT_TYPE, "application/json")
@@ -255,7 +270,7 @@ pub async fn all(
 
     let client = reqwest::Client::new();
 
-    let additional_headers = CustomHeaders::get_headers(key);
+    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
 
     let response = client.get(&url)
         .header(CONTENT_TYPE, "application/json")
@@ -286,7 +301,7 @@ pub async fn delete(
     }
 
     let client = reqwest::Client::new();
-    let additional_headers = CustomHeaders::get_headers(key);
+    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
 
     let response = client.delete(&url)
         .header(CONTENT_TYPE, "application/json")
