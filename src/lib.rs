@@ -25,8 +25,6 @@ C7MDDgdCFrHODOp7aXwjG8NaiCbiymyBglXyEN28hLvgHpvZmAn6KFo0lMGuKnz8
 HiuTfpBl6HpD6+02SQIDAQAB
 -----END PUBLIC KEY-----";
 
-//const HEADERS : &str = "";
-
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
