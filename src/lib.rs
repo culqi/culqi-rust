@@ -20,8 +20,6 @@ const SECRET_KEY: &str = "INSERTE_SU_LLAVE_PRIVADA";
 const RSA_ID: &str = "INSERTE_SU_RSA_ID";
 const RSA_KEY: &str = "INSERTE_SU_LLAVE_RSA";
 
-//const HEADERS : &str = "";
-
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
