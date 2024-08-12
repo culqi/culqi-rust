@@ -25,18 +25,6 @@ C7MDDgdCFrHODOp7aXwjG8NaiCbiymyBglXyEN28hLvgHpvZmAn6KFo0lMGuKnz8
 HiuTfpBl6HpD6+02SQIDAQAB
 -----END PUBLIC KEY-----";
 
-const HEADERS : &str = r#"{
-    "charges": {
-        "X-Charge-Channel": "recurrent"
-    },
-    "plans": {
-      "X-Plan-Type": 1
-    },
-    "allow":{
-        "X-Header-Config": true
-    }
-}"#;
-
 //const HEADERS : &str = "";
 
 
@@ -80,7 +68,7 @@ pub async fn create(
 
 
     let client = Client::new();
-    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
+    let additional_headers = CustomHeaders::get_headers(key);
     let response = client
         .post(url)
         .header("Content-Type", "application/json")
@@ -94,6 +82,52 @@ pub async fn create(
     let status_code = response.status().as_u16();
     let response_text = response.text().await?;
 
+    Ok((response_text, status_code))
+}
+
+pub async fn create_with_custom_headers(
+    body: &str,
+    action: &str,
+    pk: &str,
+    sk: &str,
+    custom_headers: &str
+) -> Result<(String, u16)> {
+    let skey: &str = sk;
+    let pkey: &str = pk;
+
+    let key: &str;
+    let url: String;
+
+    
+    ValidateIfAction::validate_class(action, body)?;
+    if action == "tokens" {
+        key = pkey;
+        url = SECURE_URL.to_string();
+    } else {
+        key = skey;
+        if(action == "plans" || action == "subscriptions"){
+            url = BASE_URL.to_owned() + "recurrent/" + action + "/create";
+        }else {
+            url = BASE_URL.to_owned() + action;
+        }
+    }
+
+
+
+    let client = Client::new();
+    let additional_headers = CustomHeaders::get_custom_headers(key, custom_headers);
+    let response = client
+        .post(url)
+        .header("Content-Type", "application/json")
+        .header("Authorization", format!("Bearer {}", key))
+        .headers(additional_headers)
+        .body(body.to_owned())
+        .send()
+        .await?;
+
+
+    let status_code = response.status().as_u16();
+    let response_text = response.text().await?;
 
     Ok((response_text, status_code))
 }
@@ -128,7 +162,7 @@ pub async fn update(
 
 
     let client = Client::new();
-    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
+    let additional_headers = CustomHeaders::get_headers(key);
 
     let response = client
         .patch(url)
@@ -157,6 +191,7 @@ pub async fn create_encrypt(
     rsa_pkey: &str,
     rsa_pid: &str,
 ) -> Result<(String, u16), Box<dyn Error>> {
+    ValidateIfAction::validate_class(action, body)?;
 
     let body_encrypt = encrypt(body, rsa_pkey, true)?;
 
@@ -166,13 +201,17 @@ pub async fn create_encrypt(
     let url: String;
 
     println!("action: {:?}", action);
-
+    
     if action == "tokens" {
         key = pkey;
         url = SECURE_URL.to_string();
     } else {
         key = skey;
-        url = BASE_URL.to_owned() + action;
+        if(action == "plans" || action == "subscriptions"){
+            url = BASE_URL.to_owned() + "recurrent/" + action + "/create";
+        }else {
+            url = BASE_URL.to_owned() + action;
+        }
     }
 
     println!("key: {:?}", key);
@@ -184,7 +223,7 @@ pub async fn create_encrypt(
     headers.insert(AUTHORIZATION, ("Bearer ".to_owned() + key).parse().unwrap());
     headers.insert("x-culqi-rsa-id", (rsa_pid).parse().unwrap());
 
-    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
+    let additional_headers = CustomHeaders::get_headers(key);
 
     // Añade aquí cualquier otro encabezado que necesites
 
@@ -200,6 +239,65 @@ pub async fn create_encrypt(
 
     Ok((response_text, status_code))
 }
+
+pub async fn create_encrypt_with_custom_headers(
+    body: &str,
+    action: &str,
+    pkey: &str,
+    skey: &str,
+    rsa_pkey: &str,
+    rsa_pid: &str,
+    custom_headers: &str
+) -> Result<(String, u16), Box<dyn Error>> {
+    ValidateIfAction::validate_class(action, body)?;
+
+    let body_encrypt = encrypt(body, rsa_pkey, true)?;
+
+    println!("body_encrypt: {:?}", body_encrypt);
+
+    let key: &str;
+    let url: String;
+
+    println!("action: {:?}", action);
+    
+    if action == "tokens" {
+        key = pkey;
+        url = SECURE_URL.to_string();
+    } else {
+        key = skey;
+        if(action == "plans" || action == "subscriptions"){
+            url = BASE_URL.to_owned() + "recurrent/" + action + "/create";
+        }else {
+            url = BASE_URL.to_owned() + action;
+        }
+    }
+
+    println!("key: {:?}", key);
+
+    let client = reqwest::Client::new();
+
+    let mut headers = HeaderMap::new();
+    headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+    headers.insert(AUTHORIZATION, ("Bearer ".to_owned() + key).parse().unwrap());
+    headers.insert("x-culqi-rsa-id", (rsa_pid).parse().unwrap());
+
+    let additional_headers = CustomHeaders::get_custom_headers(key, custom_headers);
+
+    // Añade aquí cualquier otro encabezado que necesites
+
+    let response = client.post(&url)
+        .headers(headers)
+        .headers(additional_headers)
+        .body(serde_json::to_string(&body_encrypt).unwrap())
+        .send()
+        .await?;
+
+    let status_code = response.status().as_u16();
+    let response_text = response.text().await?;
+
+    Ok((response_text, status_code))
+}
+
 
 pub async fn get(
     action: &str,
@@ -218,7 +316,7 @@ pub async fn get(
 
     let client = reqwest::Client::new();
 
-    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
+    let additional_headers = CustomHeaders::get_headers(key);
 
     let response = client.get(&url)
         .header(CONTENT_TYPE, "application/json")
@@ -270,7 +368,7 @@ pub async fn all(
 
     let client = reqwest::Client::new();
 
-    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
+    let additional_headers = CustomHeaders::get_headers(key);
 
     let response = client.get(&url)
         .header(CONTENT_TYPE, "application/json")
@@ -301,7 +399,7 @@ pub async fn delete(
     }
 
     let client = reqwest::Client::new();
-    let additional_headers = CustomHeaders::get_headers(key, HEADERS, action);
+    let additional_headers = CustomHeaders::get_headers(key);
 
     let response = client.delete(&url)
         .header(CONTENT_TYPE, "application/json")
@@ -561,6 +659,8 @@ mod tests {
         }
     }"#;
 
+
+
     #[tokio::test]
     async fn test_cargo_create() {
         // Ejemplo de cómo usar la función
@@ -575,7 +675,36 @@ mod tests {
         }
     }
 
-    
+    const CUSTOM_HEADERS : &str = r#"{
+        "X-Charge-Channel": null,
+        "X-Plan-Type": 1,
+        "X-Header-Config": true
+    }"#;
+
+    #[tokio::test]
+    async fn test_cargo_create_with_custom_headers() {
+        match create_with_custom_headers(REQUEST_CHARGUE_BODY, "charges", PUBLIC_KEY, SECRET_KEY, CUSTOM_HEADERS).await {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+                assert_eq!(status_code, 201, "Expected status code 201");
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_cargo_encrypt_create_with_custom_headers() {
+        match create_encrypt_with_custom_headers(REQUEST_CHARGUE_BODY, "charges", PUBLIC_KEY, SECRET_KEY,RSA_KEY, RSA_ID, CUSTOM_HEADERS).await {
+            Ok((response_text, status_code)) => {
+                println!("Status Code: {}", status_code);
+                println!("Response Text: {}", response_text);
+                assert_eq!(status_code, 201, "Expected status code 201");
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
+    }
+
     #[tokio::test]
     async fn test_order_delete() {
 
