@@ -1,12 +1,10 @@
-use core::fmt;
-use std::{error::Error, fmt::Debug};
-use reqwest::{Client, RequestBuilder};
+use std::{error::Error};
+use reqwest::{Client};
 mod encrypt;
 use encrypt::encrypt;
 mod validation;
 mod headers;
 use headers::CustomHeaders;
-use validation::helpers::Helpers;
 use validation::validate_if_action::ValidateIfAction;
 
 use anyhow::Result;

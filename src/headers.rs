@@ -5,49 +5,41 @@ pub struct CustomHeaders;
 
 impl CustomHeaders {
 
-    pub fn get_headers(key: &str) -> HeaderMap {
-        const X_CULQI_ENV_TEST: &str = "test";
-        const X_CULQI_ENV_LIVE: &str = "live";
-        const X_CULQI_CLIENT: &str = "culqi-rust";
-        const X_CULQI_CLIENT_VERSION: &str = "1.0.1";
-        const X_API_VERSION: &str = "2";
-        
-        let mut env = X_CULQI_ENV_LIVE;
-        
-        if key.contains("test") {
-            env = X_CULQI_ENV_TEST;
-        }
+    const X_CULQI_ENV_TEST: &'static str = "test";
+    const X_CULQI_ENV_LIVE: &'static str = "live";
+    const X_CULQI_CLIENT: &'static str = "culqi-rust";
+    const X_CULQI_CLIENT_VERSION: &'static str = "1.0.1";
+    const X_API_VERSION: &'static str = "2";
 
+    fn create_base_headers(env: &str) -> HeaderMap {
         let mut headers = HeaderMap::new();
-        headers.insert("x-culqi-env", env.parse().unwrap());
-        headers.insert("x-api-version", X_API_VERSION.parse().unwrap());
-        headers.insert("x-culqi-client", X_CULQI_CLIENT.parse().unwrap());
-        headers.insert("x-culqi-client-version", X_CULQI_CLIENT_VERSION.parse().unwrap());
+        headers.insert("x-culqi-env", env.parse().expect("Failed to parse x-culqi-env"));
+        headers.insert("x-api-version", Self::X_API_VERSION.parse().expect("Failed to parse x-api-version"));
+        headers.insert("x-culqi-client", Self::X_CULQI_CLIENT.parse().expect("Failed to parse x-culqi-client"));
+        headers.insert("x-culqi-client-version", Self::X_CULQI_CLIENT_VERSION.parse().expect("Failed to parse x-culqi-client-version"));
+        return headers
+    }
+
+    pub fn get_headers(key: &str) -> HeaderMap {
+        let env = if key.contains("test") {
+            Self::X_CULQI_ENV_TEST
+        } else {
+            Self::X_CULQI_ENV_LIVE
+        };
+
+        let headers =  Self::create_base_headers(env);
 
         return headers;
     }
 
     pub fn get_custom_headers(key: &str, custom_headers: &str) -> HeaderMap {
-        const X_CULQI_ENV_TEST: &str = "test";
-        const X_CULQI_ENV_LIVE: &str = "live";
-        const X_CULQI_CLIENT: &str = "culqi-rust";
-        const X_CULQI_CLIENT_VERSION: &str = "1.0.1";
-        const X_API_VERSION: &str = "2";
+        let env = if key.contains("test") {
+            Self::X_CULQI_ENV_TEST
+        } else {
+            Self::X_CULQI_ENV_LIVE
+        };
 
-        let mut env = X_CULQI_ENV_LIVE;
-
-        if key.contains("test") {
-            env = X_CULQI_ENV_TEST;
-        }
-
-        let mut headers = HeaderMap::new();
-        headers.insert("x-culqi-env", env.parse().unwrap());
-        headers.insert("x-api-version", X_API_VERSION.parse().unwrap());
-        headers.insert("x-culqi-client", X_CULQI_CLIENT.parse().unwrap());
-        headers.insert(
-            "x-culqi-client-version",
-            X_CULQI_CLIENT_VERSION.parse().unwrap(),
-        );
+        let mut headers = Self::create_base_headers(env);
 
         if !custom_headers.is_empty() {
             if let Ok(custom_headers_value) = serde_json::from_str::<Value>(custom_headers) {
