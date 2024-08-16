@@ -110,6 +110,34 @@ Los cargos pueden ser creados vía [API de devolución](https://apidocs.culqi.co
         }
 ```
 
+### Crear Cargo con Configuración Adicional
+
+**¿Cómo funciona la configuración adicional?**
+
+Puedes agregar campos configurables en la sección **custom_headers** para personalizar las solicitudes de cobro. Es importante tener en cuenta que no se permiten campos con valores **false**, **null**, o cadenas vacías (**''**).
+
+**Explicación:**
+- **params**: Contiene la información necesaria para crear el cargo, como el monto, la moneda, y el correo del cliente.
+- **custom_headers**: Define los encabezados personalizados para la solicitud. Recuerda que solo se permiten valores válidos.
+- **Filtrado de encabezados**: Antes de realizar la solicitud, se eliminan los encabezados con valores no permitidos (**false, null, o vacíos**) para garantizar que la solicitud sea aceptada por la API.
+
+**¿Quieres realizar cobros a una lista de comercios en un tiempo y monto determinado?**
+
+Para realizar un cobro recurrente, puedes utilizar el siguiente código (**Configuración Adicional -> custom_headers**):
+
+```rust
+let custom_headers = "{\"X-Charge-Channel\":\"recurrent\"}";
+
+match create(body, "charges", pkey, skey, custom_headers) {
+    Ok((response_text, status_code)) => {
+        println!("Status Code: {}", status_code);
+        println!("Response Text: {}", response_text);
+    }
+    Err(err) => println!("Error: {:?}", err),
+}
+```
+**Solo habilitado para metodos POST**
+
 ### Crear devolución
 
 Solicita la devolución de las compras de tus clientes (parcial o total) de forma gratuita a través del API y CulqiPanel. 

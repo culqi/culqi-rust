@@ -672,7 +672,7 @@ mod tests {
     }
 
     const CUSTOM_HEADERS : &str = r#"{
-        "X-Charge-Channel": null,
+        "X-Charge-Channel": "recurrent",
         "X-Plan-Type": 1,
         "X-Header-Config": true
     }"#;
