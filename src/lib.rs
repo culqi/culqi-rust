@@ -599,7 +599,6 @@ mod tests {
           "interval_unit_time": 1
         },
         "name": "CY PCI - ERROR 100018",
-        "image": "https://recurrencia-suscripciones-qa.s3.amazonaws.com/f097e1d5-e365-42f3-bc40-a27beab80f54",
 	    "metadata":{
 	    	"key": "value"
 	    }
@@ -609,7 +608,6 @@ mod tests {
         "short_name": "cp-prueb2442",
         "description": "Cypress PCI | ERRROR NO USAR",
         "name": "CY PCI - ERROR 100018",
-        "image": "https://recurrencia-suscripciones-qa.s3.amazonaws.com/f097e1d5-e365-42f3-bc40-a27beab80f54"
     }"#;
 
     const REQUEST_PLAN_ALL: &str = r#"{
