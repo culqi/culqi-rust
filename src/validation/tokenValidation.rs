@@ -1,9 +1,9 @@
 use crate::utils::CustomException::CustomException;
+use chrono::{Datelike, Local, NaiveDate};
 use regex::Regex;
-use chrono::{Local, Datelike, NaiveDate};
 use serde_json::Value;
 
-use super::{helpers::Helpers};
+use super::helpers::Helpers;
 
 pub struct TokenValidation;
 
@@ -15,7 +15,9 @@ impl TokenValidation {
                 return Err(CustomException::new("Invalid card number."));
             }
         } else {
-            return Err(CustomException::new("Card number not found or is not a string"));
+            return Err(CustomException::new(
+                "Card number not found or is not a string",
+            ));
         }
 
         let cvv_pattern = Regex::new(r"^\d{3,4}$").unwrap();
@@ -54,7 +56,10 @@ impl TokenValidation {
             return Err(CustomException::new("Missing expiration year."));
         }
 
-        if let (Some(year), Some(month)) = (parsed.get("expiration_year").and_then(Value::as_str), parsed.get("expiration_month").and_then(Value::as_str)) {
+        if let (Some(year), Some(month)) = (
+            parsed.get("expiration_year").and_then(Value::as_str),
+            parsed.get("expiration_month").and_then(Value::as_str),
+        ) {
             let exp_date_str = format!("{}-{}-01", year, month);
             if let Ok(exp_date) = NaiveDate::parse_from_str(&exp_date_str, "%Y-%m-%d") {
                 if exp_date < Local::now().naive_local().date() {

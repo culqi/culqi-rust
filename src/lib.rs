@@ -1,12 +1,13 @@
 #![crate_name = "LibCulqi"]
 #![allow(non_snake_case)]
+
 pub mod utils;
 use crate::utils::encrypt::encrypt;
 use crate::utils::headers::CustomHeaders;
 use crate::utils::urls::{BASE_URL, SECURE_URL};
 
-use std::error::Error;
 use reqwest::Client;
+use std::error::Error;
 mod validation;
 use anyhow::Result;
 use validation::validate_if_action::ValidateIfAction;
@@ -142,7 +143,7 @@ pub async fn update(
 }
 
 use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};
-use serde_json::Value; 
+use serde_json::Value;
 
 pub async fn create_encrypt(
     body: &str,
