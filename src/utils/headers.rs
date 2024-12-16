@@ -4,7 +4,6 @@ use serde_json::Value;
 pub struct CustomHeaders;
 
 impl CustomHeaders {
-
     const X_CULQI_ENV_TEST: &'static str = "test";
     const X_CULQI_ENV_LIVE: &'static str = "live";
     const X_CULQI_CLIENT: &'static str = "culqi-rust";
@@ -13,11 +12,29 @@ impl CustomHeaders {
 
     fn create_base_headers(env: &str) -> HeaderMap {
         let mut headers = HeaderMap::new();
-        headers.insert("x-culqi-env", env.parse().expect("Failed to parse x-culqi-env"));
-        headers.insert("x-api-version", Self::X_API_VERSION.parse().expect("Failed to parse x-api-version"));
-        headers.insert("x-culqi-client", Self::X_CULQI_CLIENT.parse().expect("Failed to parse x-culqi-client"));
-        headers.insert("x-culqi-client-version", Self::X_CULQI_CLIENT_VERSION.parse().expect("Failed to parse x-culqi-client-version"));
-        return headers
+        headers.insert(
+            "x-culqi-env",
+            env.parse().expect("Failed to parse x-culqi-env"),
+        );
+        headers.insert(
+            "x-api-version",
+            Self::X_API_VERSION
+                .parse()
+                .expect("Failed to parse x-api-version"),
+        );
+        headers.insert(
+            "x-culqi-client",
+            Self::X_CULQI_CLIENT
+                .parse()
+                .expect("Failed to parse x-culqi-client"),
+        );
+        headers.insert(
+            "x-culqi-client-version",
+            Self::X_CULQI_CLIENT_VERSION
+                .parse()
+                .expect("Failed to parse x-culqi-client-version"),
+        );
+        return headers;
     }
 
     pub fn get_headers(key: &str) -> HeaderMap {
@@ -27,7 +44,7 @@ impl CustomHeaders {
             Self::X_CULQI_ENV_LIVE
         };
 
-        let headers =  Self::create_base_headers(env);
+        let headers = Self::create_base_headers(env);
 
         return headers;
     }

@@ -1,29 +1,28 @@
-use std::error::Error;
-use openssl::rsa::{Padding, Rsa};
+use aes_gcm::aead::{generic_array::GenericArray, Aead, NewAead};
 use aes_gcm::Aes256Gcm;
-use aes_gcm::aead::{Aead, NewAead, generic_array::GenericArray};
-use rand::Rng;
+use base64::{encode, DecodeError};
 use openssl::pkey::PKey;
-use base64::{DecodeError, encode};
+use openssl::rsa::{Padding, Rsa};
+use rand::Rng;
+use serde_json::Value;
 use std::collections::HashMap;
+use std::error::Error;
 use std::fmt;
-use serde_json::{Value};
 use std::io::Error as IoError;
 use std::string::FromUtf8Error;
 //use rsa::{PublicKey};
+use openssl::encrypt::Encrypter;
 use openssl::hash::MessageDigest;
-use openssl::encrypt::{Encrypter};
 
 #[derive(Debug)]
 pub enum MyError {
     AesGcmError(aes_gcm::Error),
     RsaError(openssl::error::ErrorStack),
-    JsonError(serde_json::Error),  // Add this line
+    JsonError(serde_json::Error), // Add this line
     Other(String),
     IoError(IoError),
     Decode(DecodeError),
     Utf8Error(FromUtf8Error),
-
 }
 
 impl fmt::Display for MyError {
@@ -31,12 +30,11 @@ impl fmt::Display for MyError {
         match *self {
             MyError::AesGcmError(ref err) => write!(f, "AES GCM error: {}", err),
             MyError::RsaError(ref err) => write!(f, "RSA error: {}", err),
-            MyError::JsonError(ref err) => write!(f, "JSON error: {}", err),  // And this line
+            MyError::JsonError(ref err) => write!(f, "JSON error: {}", err), // And this line
             MyError::Other(ref err) => write!(f, "Other error: {}", err),
             MyError::IoError(ref err) => write!(f, "IO error: {}", err),
             MyError::Decode(ref err) => write!(f, "IO error: {}", err),
             MyError::Utf8Error(ref err) => write!(f, "IO error: {}", err),
-
         }
     }
 }
@@ -46,7 +44,7 @@ impl Error for MyError {
         match *self {
             MyError::AesGcmError(ref _err) => None,
             MyError::RsaError(ref err) => Some(err),
-            MyError::JsonError(ref err) => Some(err),  // And this line
+            MyError::JsonError(ref err) => Some(err), // And this line
             MyError::Other(ref _err) => None,
             MyError::IoError(ref err) => Some(err),
             MyError::Decode(ref err) => Some(err),
@@ -78,14 +76,12 @@ impl From<openssl::error::ErrorStack> for MyError {
     }
 }
 
-
 // Add this implementation
 impl From<serde_json::Error> for MyError {
     fn from(err: serde_json::Error) -> MyError {
         MyError::JsonError(err)
     }
 }
-
 
 impl From<DecodeError> for MyError {
     fn from(error: DecodeError) -> Self {
@@ -95,10 +91,11 @@ impl From<DecodeError> for MyError {
     }
 }
 
-
-pub fn encrypt(data: &str, rsa_public_key: &str, is_json: bool) -> Result<HashMap<String, String>, MyError> {
-
-
+pub fn encrypt(
+    data: &str,
+    rsa_public_key: &str,
+    is_json: bool,
+) -> Result<HashMap<String, String>, MyError> {
     let json_data: Value = if is_json {
         serde_json::from_str(&data)?
     } else {
@@ -123,15 +120,11 @@ pub fn encrypt(data: &str, rsa_public_key: &str, is_json: bool) -> Result<HashMa
     let mut ciphertext = cipher.encrypt(nonce, &plaintext[..])?;
     ciphertext = Vec::from(&ciphertext[..ciphertext.len() - 16]);
 
-
     // Convert encrypted data to base64 string
     let encrypted_data = encode(&ciphertext);
 
-
-
     let public_key = Rsa::public_key_from_pem(rsa_public_key.as_bytes()).unwrap();
     let public_key = PKey::from_rsa(public_key).unwrap();
-
 
     // Encrypt message
     let mut encrypter = Encrypter::new(&public_key).unwrap();
@@ -156,7 +149,6 @@ pub fn encrypt(data: &str, rsa_public_key: &str, is_json: bool) -> Result<HashMa
 
     let encrypted_key_b64 = encode(&encrypted_key);
     let encrypted_iv_b64 = encode(&encrypted_iv);
-
 
     let mut map = HashMap::new();
     map.insert("encrypted_data".to_string(), encrypted_data);

@@ -4,9 +4,8 @@ mod config;
 use config::credentials::{PUBLIC_KEY, SECRET_KEY};
 mod request {
     pub mod plan;
-
 }
-use request::plan::{REQUEST_PLAN_CREATE, REQUEST_PLAN_UPDATE, REQUEST_PLAN_ALL};
+use request::plan::{REQUEST_PLAN_ALL, REQUEST_PLAN_CREATE, REQUEST_PLAN_UPDATE};
 
 #[cfg(test)]
 mod tests {

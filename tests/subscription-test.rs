@@ -2,11 +2,12 @@ use tokio;
 use LibCulqi::*;
 mod config; // Esto importa el archivo config.rs en la carpeta tests
 use config::credentials::{PUBLIC_KEY, SECRET_KEY};
-mod request { 
+mod request {
     pub mod subscription;
-
 }
-use request::subscription::{REQUEST_SUBSCRIṔTTION_CREATE, REQUEST_SUBSCRIṔTTION_UPDATE, REQUEST_SUBSCRIṔTTION_ALL};
+use request::subscription::{
+    REQUEST_SUBSCRIṔTTION_ALL, REQUEST_SUBSCRIṔTTION_CREATE, REQUEST_SUBSCRIṔTTION_UPDATE,
+};
 
 #[cfg(test)]
 mod tests {
@@ -85,5 +86,4 @@ mod tests {
             Err(e) => eprintln!("Error: {}", e),
         }
     }
-
 }

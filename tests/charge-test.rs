@@ -1,12 +1,12 @@
 use tokio;
 use LibCulqi::*;
 mod config; // Esto importa el archivo config.rs en la carpeta tests
-use config::credentials::{PUBLIC_KEY, SECRET_KEY,RSA_KEY, RSA_ID};
-mod request { 
+use config::credentials::{PUBLIC_KEY, RSA_ID, RSA_KEY, SECRET_KEY};
+mod request {
     pub mod charge;
 }
 
-use request::charge::{REQUEST_CHARGUE_BODY,CUSTOM_HEADERS};
+use request::charge::{CUSTOM_HEADERS, REQUEST_CHARGUE_BODY};
 
 #[cfg(test)]
 mod tests {
@@ -70,5 +70,4 @@ mod tests {
             Err(err) => println!("Error: {:?}", err),
         }
     }
-  
 }
