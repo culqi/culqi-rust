@@ -1,11 +1,10 @@
+use crate::utils::CustomException::CustomException;
 extern crate regex;
 use std::collections::{HashMap, HashSet};
 
 use chrono::{Utc, TimeZone};
 use regex::Regex;
 use serde_json::Value;
-
-use super::CustomException::CustomException;
 
 pub struct Helpers;
 
@@ -52,21 +51,8 @@ impl Helpers {
     }
     
     pub fn is_future_date(expiration_date: i64) -> bool {
-        let exp_date = Utc.timestamp(expiration_date, 0);
-        exp_date > Utc::now()
-    }
-    
-    pub fn validate_date_filter(date_from: &str, date_to: &str) -> Result<(), CustomException> {
-        let parsed_date_from = date_from.parse::<i32>()
-            .map_err(|_| CustomException::new("Invalid value. Date_from must be an integer."))?;
-        let parsed_date_to = date_to.parse::<i32>()
-            .map_err(|_| CustomException::new("Invalid value. Date_to must be an integer."))?;
-    
-        if parsed_date_to < parsed_date_from {
-            return Err(CustomException::new("Invalid value. Date_from must be less than Date_to."));
-        }
-    
-        Ok(())
+        let exp_date = Utc.timestamp_opt(expiration_date, 0).single();
+        exp_date.map_or(false, |d| d > Utc::now())
     }
     
     pub fn validate_amount_value(amount_obj: &str) -> Result<(), CustomException> {
@@ -112,19 +98,19 @@ impl Helpers {
             }
         }
     
-        if let Some(count) = initial_cycles.get("count").and_then(|v| v.as_i64()) {
+        if let Some(_count) = initial_cycles.get("count").and_then(|v| v.as_i64()) {
             // Se ha obtenido un valor válido de tipo i64
         } else {
             return Err(CustomException::new("El campo 'initial_cycles.count' es inválido o está vacío."));
         }
     
-        if let Some(has_initial_charge) = initial_cycles.get("has_initial_charge").and_then(|v| v.as_bool()) {
+        if let Some(_has_initial_charge) = initial_cycles.get("has_initial_charge").and_then(|v| v.as_bool()) {
             // Se ha obtenido un valor válido de tipo bool
         } else {
             return Err(CustomException::new("El campo 'initial_cycles.has_initial_charge' es inválido o está vacío."));
         }
     
-        if let Some(amount) = initial_cycles.get("amount").and_then(|v| v.as_i64()) {
+        if let Some(_amount) = initial_cycles.get("amount").and_then(|v| v.as_i64()) {
             // Se ha obtenido un valor válido de tipo i64
         } else {
             return Err(CustomException::new("El campo 'initial_cycles.amount' es inválido o está vacío."));
