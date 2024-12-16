@@ -15,7 +15,7 @@ pub struct ValidateIfAction;
 impl ValidateIfAction {
 
     pub fn validate_class(action: &str, body: &str) -> Result<(String, u16)>{
-        if(action == "tokens") {
+        if action == "tokens" {
             match TokenValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -26,7 +26,7 @@ impl ValidateIfAction {
             }
         }
 
-        if(action == "charges") {
+        if action == "charges" {
             match ChargeValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -37,7 +37,7 @@ impl ValidateIfAction {
             }
         }
         
-        if(action == "cards") {
+        if action == "cards" {
             match CardValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -48,7 +48,7 @@ impl ValidateIfAction {
             }
         }
         
-        if(action == "customers") {
+        if action == "customers" {
             match CustomerValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -59,7 +59,7 @@ impl ValidateIfAction {
             }
         }
         
-        if(action.contains("plans")) {
+        if action.contains("plans") {
             match PlanValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -71,7 +71,7 @@ impl ValidateIfAction {
             
         }
         
-        if(action == "refunds") {
+        if action == "refunds" {
             match RefundValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -81,7 +81,7 @@ impl ValidateIfAction {
                 }
             }
         }
-        if(action.contains("subscriptions")) {
+        if action.contains("subscriptions") {
             match SubscriptionValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -91,7 +91,7 @@ impl ValidateIfAction {
                 }
             }
         }
-        if(action == "orders") {
+        if action == "orders" {
             match OrderValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -106,7 +106,7 @@ impl ValidateIfAction {
     }
 
     pub fn validate_update_class(action: &str, body: &str) -> Result<(String, u16)>{
-        if(action.contains("plans")) {
+        if action.contains("plans") {
             match PlanValidation::update(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -117,7 +117,7 @@ impl ValidateIfAction {
             }
             
         }
-        if(action.contains("subscriptions")) {
+        if action.contains("subscriptions") {
             match SubscriptionValidation::update(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -131,7 +131,7 @@ impl ValidateIfAction {
     }
 
     pub fn validate_all_class(action: &str, query: &str) -> Result<(String, u16)>{
-        if(action.contains("plans")) {
+        if action.contains("plans") {
             match PlanValidation::list(query) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -142,7 +142,7 @@ impl ValidateIfAction {
             }
             
         }
-        if(action.contains("subscriptions")) {
+        if action.contains("subscriptions") {
             match SubscriptionValidation::list(query) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -156,7 +156,7 @@ impl ValidateIfAction {
     }
 
     pub fn validate_id_class(action: &str, query: &str) -> Result<(String, u16)>{
-        if(action.contains("plans")) {
+        if action.contains("plans") {
             match Helpers::validate_id(query, "pln") {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));
@@ -167,7 +167,7 @@ impl ValidateIfAction {
             }
             
         }
-        if(action.contains("subscriptions")) {
+        if action.contains("subscriptions") {
             match Helpers::validate_id(query, "sxn") {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));

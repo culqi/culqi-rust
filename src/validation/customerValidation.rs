@@ -1,9 +1,7 @@
-use regex::Regex;
-use std::collections::HashMap;
-use chrono::{Local, Datelike, NaiveDate};
+use crate::utils::CustomException::CustomException;
 use serde_json::Value;
 
-use super::{helpers::Helpers, CustomException::CustomException};
+use super::{helpers::Helpers};
 
 pub struct CustomerValidation;
 
@@ -31,7 +29,7 @@ impl CustomerValidation {
             return Err(CustomException::new("address_city is empty."));
         }
 
-        let phone_number = parsed.get("phone_number").and_then(Value::as_str).ok_or(CustomException::new("Invalid 'phone_number'. It should be a string."))?;
+        // let phone_number = parsed.get("phone_number").and_then(Value::as_str).ok_or(CustomException::new("Invalid 'phone_number'. It should be a string."))?;
         // Assuming phone_number is always a string in Rust, no instanceof check is needed.
 
         let country_codes = Helpers::get_country_codes();

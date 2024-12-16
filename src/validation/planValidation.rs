@@ -1,9 +1,6 @@
-use regex::Regex;
-use std::collections::HashMap;
-use chrono::{Local, Datelike, NaiveDate};
+use crate::utils::CustomException::CustomException;
 use serde_json::Value;
-
-use super::{helpers::Helpers, CustomException::CustomException};
+use super::helpers::Helpers;
 
 pub struct PlanValidation;
 
@@ -46,7 +43,7 @@ impl PlanValidation {
             return Err(CustomException::new("El campo 'interval_count' es inválido o está vacío."));
         }
 
-        if let Some(amount) = json_data["amount"].as_i64() {} else {
+        if let Some(_amount) = json_data["amount"].as_i64() {} else {
             return Err(CustomException::new("El campo 'amount' es inválido o está vacío, debe tener un valor numérico."));
         }
 
