@@ -27,8 +27,8 @@ impl OrderValidation {
         let currency_code = parsed.get("currency_code").and_then(Value::as_str).ok_or(CustomException::new("currency_code is missing"))?;
         Helpers::validate_currency_code(currency_code)?;
 
-        let amount_obj = parsed.get("amount").and_then(Value::as_str).ok_or(CustomException::new("Amount not found"))?;
-        Helpers::validate_amount_value(amount_obj)?;
+        let amount_obj = parsed.get("amount").and_then(Value::as_i64).ok_or(CustomException::new("Amount not found"))?;
+        Helpers::validate_amount_value(&amount_obj.to_string())?;
 
         let expiration_date = parsed.get("expiration_date").and_then(Value::as_i64).ok_or(CustomException::new("expiration_date is missing or not a valid integer"))?;
         if !Helpers::is_future_date(expiration_date) {
