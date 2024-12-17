@@ -41,7 +41,7 @@ mod tests {
 
         // Crear los metadatos como un HashMap
         let mut metadata = HashMap::new();
-        metadata.insert("dni".to_string(), json!("71702999"));
+        metadata.insert("dni".to_string(), json!("72702999"));
 
         // Añadir metadata al cuerpo de la solicitud
         order_request.insert("metadata".to_string(), json!(metadata));
