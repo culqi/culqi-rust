@@ -1,5 +1,6 @@
 use BrandoCulqi::client::Client;
 use BrandoCulqi::culqi::order::Order;
+use BrandoCulqi::utils::CustomException::CustomException;
 use std::collections::HashMap;
 use serde_json::{json, Value};
 mod config;
@@ -25,7 +26,7 @@ mod tests {
         order_request.insert("currency_code".to_string(), json!("PEN"));
         order_request.insert("description".to_string(), json!("Venta de prueba"));
         order_request.insert("order_number".to_string(), json!(order_number));
-        order_request.insert("expiration_date".to_string(), json!(expiration_timestamp.to_string()));
+        order_request.insert("expiration_date".to_string(), json!(expiration_timestamp));
         order_request.insert("confirm".to_string(), json!(true));
 
         // Crear los detalles del cliente como un HashMap anidado
@@ -58,7 +59,15 @@ mod tests {
                 assert_eq!(response_json["object"], "order");
                 assert!(response_json["id"].is_string(), "El campo 'id' no es una cadena");
             }
-            Err(e) => eprintln!("Error al crear la orden: {}", e),
-        }
+            Err(e) => {
+                // Aquí, el error es un CustomException, así que podemos llamar get_status_code
+                println!("Error al crear la orden: {}", e);
+                // Verifica si el error es de tipo CustomException para poder acceder al status code
+                if let Some(custom_error) = e.downcast_ref::<CustomException>() {
+                    println!("Status code: {}", custom_error.get_status_code());
+                } else {
+                    println!("Error desconocido");
+                }
+            }        }
     }
 }

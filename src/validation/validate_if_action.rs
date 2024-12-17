@@ -8,6 +8,7 @@ use super::refundValidation::RefundValidation;
 use super::subscriptionValidation::SubscriptionValidation;
 use super::tokenValidation::TokenValidation;
 use anyhow::Result;
+use crate::utils::urls::ORDER_URL;
 
 pub struct ValidateIfAction;
 
@@ -88,7 +89,7 @@ impl ValidateIfAction {
                 }
             }
         }
-        if action == "orders" {
+        if action == ORDER_URL {
             match OrderValidation::create(body) {
                 Ok(_) => {
                     return Ok(("Validation succeeded".to_string(), 200));

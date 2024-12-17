@@ -1,6 +1,7 @@
+use crate::utils::urls::{BASE_URL, SECURE_URL};
+use anyhow::Result;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::Serialize;
-use anyhow::Result;
 pub struct Client {
     client: reqwest::Client,
     secret_key: String,
@@ -34,8 +35,9 @@ impl Client {
         &self,
         path: &str,
         body: &T,
+        secure: bool,
     ) -> Result<(String, u16)> {
-        let url = get_url(path);
+        let url = get_url(path, secure);
         let json_body = serde_json::to_string(body)?;
 
         let response = self
@@ -52,6 +54,7 @@ impl Client {
     }
 }
 
-fn get_url(path: &str) -> String {
-    String::from("https://api.culqi.com/v2") + path
+fn get_url(path: &str, secure: bool) -> String {
+    let base_url = if secure { SECURE_URL } else { BASE_URL };
+    format!("{}{}", base_url, path)
 }
