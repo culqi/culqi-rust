@@ -7,10 +7,10 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn new(secret_key: String) -> Self {
+    pub fn new(secret_key: &str) -> Self {
         Self {
             client: reqwest::Client::new(),
-            secret_key,
+            secret_key: secret_key.to_string(),
         }
     }
 
