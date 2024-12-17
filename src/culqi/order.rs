@@ -1,7 +1,10 @@
-extern crate serde_json;
+use crate::validation::validate_if_action::ValidateIfAction;
+use crate::utils::urls::ORDER_URL;
 use crate::client::Client;
+extern crate serde_json;
+
 use serde::Serialize;
-use anyhow::{Result};
+use anyhow::Result;
 
 #[derive(Debug, Serialize)]
 pub struct Order {
@@ -9,7 +12,11 @@ pub struct Order {
 
 impl Order {
     pub async fn create<T: Serialize>(client: &Client, order_request: &T) -> Result<(String, u16)> {
-        let response = client.post("/orders", order_request).await?;
+        println!("Init Validation");
+        let order_request_json = serde_json::to_string(order_request)?;
+        ValidateIfAction::validate_class(ORDER_URL, &order_request_json)?;
+        println!("Finished Validation");
+        let response = client.post(ORDER_URL, order_request, false).await?;
         Ok(response)
     }
 }
