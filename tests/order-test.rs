@@ -1,19 +1,17 @@
+use serde_json::{json, Value};
+use std::collections::HashMap;
 use BrandoCulqi::client::Client;
 use BrandoCulqi::culqi::order::Order;
-use BrandoCulqi::utils::CustomException::CustomException;
-use std::collections::HashMap;
-use serde_json::{json, Value};
 mod config;
 use config::credentials::SECRET_KEY;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::{Utc, Duration};
+    use chrono::{Duration, Utc};
 
     #[tokio::test]
     async fn test_order_create() {
-
         // Crear el cuerpo de la solicitud utilizando la nueva estructura
         let expiration_date = Utc::now() + Duration::days(1);
         let expiration_timestamp = expiration_date.timestamp();
@@ -57,17 +55,15 @@ mod tests {
                     .expect("Error al parsear la respuesta JSON");
 
                 assert_eq!(response_json["object"], "order");
-                assert!(response_json["id"].is_string(), "El campo 'id' no es una cadena");
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
             }
             Err(e) => {
                 // Aquí, el error es un CustomException, así que podemos llamar get_status_code
                 println!("Error al crear la orden: {}", e);
-                // Verifica si el error es de tipo CustomException para poder acceder al status code
-                if let Some(custom_error) = e.downcast_ref::<CustomException>() {
-                    println!("Status code: {}", custom_error.get_status_code());
-                } else {
-                    println!("Error desconocido");
-                }
-            }        }
+            }
+        }
     }
 }

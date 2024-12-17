@@ -14,7 +14,9 @@ impl Order {
     pub async fn create<T: Serialize>(client: &Client, order_request: &T) -> Result<(String, u16)> {
         println!("Init Validation");
         let order_request_json = serde_json::to_string(order_request)?;
-        ValidateIfAction::validate_class(ORDER_URL, &order_request_json)?;
+        if let Err(validation_error) = ValidateIfAction::validate_class(ORDER_URL, &order_request_json) {
+            return Ok((validation_error.to_string(), 400)); // Convertimos el CustomException a String con `to_json()`
+        }
         println!("Finished Validation");
         let response = client.post(ORDER_URL, order_request, false).await?;
         Ok(response)
