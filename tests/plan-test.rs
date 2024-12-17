@@ -1,5 +1,5 @@
 use tokio;
-use LibCulqi::*;
+use BrandoCulqi::*;
 mod config;
 use config::credentials::{PUBLIC_KEY, SECRET_KEY};
 mod request {

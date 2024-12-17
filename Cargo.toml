@@ -1,5 +1,5 @@
 [package]
-name = "LibCulqi"
+name = "BrandoCulqi"
 version = "1.0.1"
 edition = "2021"
 description = "API bindings for the Culqi v2 HTTP API"
@@ -15,8 +15,9 @@ exclude = ["src/main.rs", "examples/new_charge.rs"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+hyper = "0.14.16"
 reqwest = "0.11"
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.42.0", features = ["full"] }
 aes-gcm = "0.9.3"
 rand = "0.8.4"
 base64 = "0.13.0"
@@ -30,6 +31,6 @@ x509-parser = "0.9.0"
 pkcs8 = "0.7"
 serde_json = "1.0.66"
 crypto = "0.5.1"
-chrono = "0.4"
-serde = { version = "1.0", features = ["derive"] }
-anyhow = "1.0"
+chrono = "0.4.39"
+serde = { version = "1.0.216", features = ["derive"] }
+anyhow = "1.0.94"
