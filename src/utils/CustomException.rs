@@ -14,7 +14,7 @@ impl fmt::Display for CustomException {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // Serialize the error_data HashMap into a JSON string
         match serde_json::to_string(&self.error_data) {
-            Ok(json_str) => write!(f, "{} Status code: 400", json_str), // Status code fijo 400
+            Ok(json_str) => write!(f, "{}", json_str), // If serialization is successful, write the JSON string
             Err(_) => write!(f, "{{\"error\": \"Failed to serialize error data\"}}"), // Handle serialization errors
         }
     }
@@ -34,10 +34,6 @@ impl CustomException {
 
     pub fn get_error_data(&self) -> &HashMap<String, String> {
         &self.error_data
-    }
-    
-    pub fn get_status_code(&self) -> u16 {
-        400
     }
 }
 
