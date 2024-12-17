@@ -1,7 +1,14 @@
-#![crate_name = "LibCulqi"]
+#![crate_name = "BrandoCulqi"]
 #![allow(non_snake_case)]
 
 pub mod utils;
+pub mod client;
+pub mod culqi {
+    pub mod order;
+}
+
+extern crate hyper;
+
 use crate::utils::encrypt::encrypt;
 use crate::utils::headers::CustomHeaders;
 use crate::utils::urls::{BASE_URL, SECURE_URL};

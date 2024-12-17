@@ -1,5 +1,5 @@
 use tokio;
-use LibCulqi::*;
+use BrandoCulqi::*;
 mod config; // Esto importa el archivo config.rs en la carpeta tests
 use config::credentials::{PUBLIC_KEY, SECRET_KEY};
 mod request {
