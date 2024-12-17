@@ -45,7 +45,7 @@ mod tests {
         // Añadir metadata al cuerpo de la solicitud
         order_request.insert("metadata".to_string(), json!(metadata));
 
-        let client = Client::new(SECRET_KEY.to_string());
+        let client = Client::new(SECRET_KEY);
 
         match Order::create(&client, &order_request).await {
             Ok((response_text, status_code)) => {
