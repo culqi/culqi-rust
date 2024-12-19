@@ -7,7 +7,7 @@ pub struct CustomException {
 }
 
 // Implementing Error trait for CustomException
-impl std::error::Error for CustomException {}
+impl warp::reject::Reject for CustomException {}
 
 // Implement Display for CustomException to provide a string representation
 impl fmt::Display for CustomException {
