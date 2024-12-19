@@ -1,55 +1,66 @@
-use serde_json::{json, Value};
-use std::collections::HashMap;
+use serde_json::Value;
 use BrandoCulqi::client::Client;
 use BrandoCulqi::culqi::order::Order;
 mod config;
-use config::credentials::SECRET_KEY;
+use config::credentials::{SECRET_KEY, PUBLIC_KEY, RSA_KEY, RSA_ID};
+use lazy_static::lazy_static;
+use warp::Reply;
+use warp::hyper::body::to_bytes;
+
+mod request; 
+use request::order::{create_order_request,LIST_ORDER_REQUEST};
+lazy_static! {
+    static ref client: Client = Client::config(SECRET_KEY, PUBLIC_KEY, Some(RSA_KEY));
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::{Duration, Utc};
-
     #[tokio::test]
+
     async fn test_order_create() {
-        // Crear el cuerpo de la solicitud utilizando la nueva estructura
-        let expiration_date = Utc::now() + Duration::days(1);
-        let expiration_timestamp = expiration_date.timestamp();
-        let timestamp = Utc::now().timestamp_millis();
-        let order_number = format!("#pedido-{}", timestamp);
+        match Order::create(&client, &create_order_request(), None).await {
+            Ok(reply) => {
+                // Convertir el reply a una respuesta HTTP para extraer el cuerpo
+                let response = reply.into_response();
+                let body_bytes = to_bytes(response.into_body())
+                    .await
+                    .expect("Error al leer el cuerpo de la respuesta");
+                let response_text = String::from_utf8(body_bytes.to_vec())
+                    .expect("Error al convertir el cuerpo a texto UTF-8");
+    
+                println!("Respuesta de la order: {}", response_text);
+    
+                // Parsear la respuesta como JSON
+                let response_json: Value = serde_json::from_str(&response_text)
+                    .expect("Error al parsear la respuesta JSON");
+    
+                // Aserciones
+                assert_eq!(response_json["object"], "order");
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
+            }
+            Err(e) => {
+                println!("Error al crear la order: {:?}", e);
+                panic!("La prueba falló debido a un error en Order::create");
+            }
+        }
+    }
+/*
+    #[tokio::test]
+    async fn test_order_create_encrypt() {
+        const CUSTOM_HEADERS: &str = r#"{
+            "x-culqi-rsa-id": "{RSA_ID}"
+        }"#;
 
-        // Crear el cuerpo de la solicitud utilizando HashMap y serde_json::json!
-        let mut order_request = HashMap::new();
-        order_request.insert("amount".to_string(), json!(10000));
-        order_request.insert("currency_code".to_string(), json!("PEN"));
-        order_request.insert("description".to_string(), json!("Venta de prueba"));
-        order_request.insert("order_number".to_string(), json!(order_number));
-        order_request.insert("expiration_date".to_string(), json!(expiration_timestamp));
-        order_request.insert("confirm".to_string(), json!(true));
+        let custom_headers = CUSTOM_HEADERS.replace("{RSA_ID}", RSA_ID);
 
-        // Crear los detalles del cliente como un HashMap anidado
-        let mut client_details = HashMap::new();
-        client_details.insert("first_name".to_string(), json!("Brando"));
-        client_details.insert("last_name".to_string(), json!("Carquin"));
-        client_details.insert("email".to_string(), json!("brando.carquin@culqi.com"));
-        client_details.insert("phone_number".to_string(), json!("+51948747421"));
-
-        // Añadir client_details al cuerpo de la solicitud
-        order_request.insert("client_details".to_string(), json!(client_details));
-
-        // Crear los metadatos como un HashMap
-        let mut metadata = HashMap::new();
-        metadata.insert("dni".to_string(), json!("72702999"));
-
-        // Añadir metadata al cuerpo de la solicitud
-        order_request.insert("metadata".to_string(), json!(metadata));
-
-        let client = Client::new(SECRET_KEY);
-
-        match Order::create(&client, &order_request).await {
+        match Order::create(&client, &create_order_request(), Some(&custom_headers)).await {
             Ok((response_text, status_code)) => {
-                println!("Orden creada exitosamente con status code: {}", status_code);
-                println!("Respuesta de la orden: {}", response_text);
+                println!("Orden encrypt creada exitosamente con status code: {}", status_code);
+                println!("Respuesta de la order encrypt : {}", response_text);
 
                 let response_json: Value = serde_json::from_str(&response_text)
                     .expect("Error al parsear la respuesta JSON");
@@ -61,9 +72,86 @@ mod tests {
                 );
             }
             Err(e) => {
-                // Aquí, el error es un CustomException, así que podemos llamar get_status_code
-                println!("Error al crear la orden: {}", e);
+                println!("Error al crear la order encrypt: {}", e);
             }
         }
     }
-}
+
+    #[tokio::test]
+    async fn test_order_get() {
+        let order = Order::create(&client, &create_order_request(), None).await;
+        match order {
+            Ok((response_text, _status_code)) => {
+                println!("Respuesta crear Orden: {}", response_text);
+                let response_json: Value = serde_json::from_str(&response_text)
+                    .expect("Error al parsear la respuesta JSON");
+                if let Some(order_id) = response_json["id"].as_str() {
+                    println!("ID del order: {}", order_id);
+                    match Order::get(&client, order_id, None).await {
+                        Ok((response_text, _status_code)) => {
+                            println!("Respuesta del GET order: {}", response_text);
+                            assert_eq!(response_json["object"], "order");
+                            assert!(
+                                response_json["id"].is_string(),
+                                "El campo 'id' no es una cadena"
+                            );
+                        }
+                        Err(e) => eprintln!("Error al obtener el order: {}", e),
+                    }
+                } else {
+                    eprintln!("No se encontró el 'id' en la respuesta del servidor");
+                }
+            }
+            Err(e) => eprintln!("Error al crear el order: {}", e),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_order_list() {
+        match Order::all(&client, LIST_ORDER_REQUEST, None).await {
+            Ok((response_text, status_code)) => {
+                println!(
+                    "Token Encrypt creado exitosamente con status code: {}",
+                    status_code
+                );
+                println!("Respuesta del order: {}", response_text);
+
+                let response_json: Value = serde_json::from_str(&response_text)
+                    .expect("Error al parsear la respuesta JSON");
+
+                assert!(
+                    response_json["paging"].is_object(),
+                    "El campo 'paging' debe ser 'object'"
+                );
+            }
+            Err(e) => {
+                println!("Error al crear el order encriptado: {}", e);
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_order_delete() {
+        let order = Order::create(&client, &create_order_request(), None).await;
+        match order {
+            Ok((response_text, _status_code)) => {
+                println!("Respuesta crear Orden: {}", response_text);
+                let response_json: Value = serde_json::from_str(&response_text)
+                    .expect("Error al parsear la respuesta JSON");
+                if let Some(order_id) = response_json["id"].as_str() {
+                    println!("ID del order: {}", order_id);
+                    match Order::delete(&client, order_id, None).await {
+                        Ok((_response_text, status_code)) => {
+                            println!("Respuesta del DELETE order | status_code: {}", status_code);
+                            assert_eq!(status_code, 204);
+                        }
+                        Err(e) => eprintln!("Error al obtener el order: {}", e),
+                    }
+                } else {
+                    eprintln!("No se encontró el 'id' en la respuesta del servidor");
+                }
+            }
+            Err(e) => eprintln!("Error al crear el order: {}", e),
+        }
+    }
+*/}

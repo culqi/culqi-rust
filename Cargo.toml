@@ -1,6 +1,6 @@
 [package]
 name = "BrandoCulqi"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 description = "API bindings for the Culqi v2 HTTP API"
 authors = ["Team Culqi"]
@@ -34,3 +34,5 @@ crypto = "0.5.1"
 chrono = "0.4.39"
 serde = { version = "1.0.216", features = ["derive"] }
 anyhow = "1.0.94"
+lazy_static = "1.4"
+warp = "0.3"

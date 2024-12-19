@@ -5,6 +5,7 @@ pub mod utils;
 pub mod client;
 pub mod culqi {
     pub mod order;
+    pub mod token;
 }
 
 extern crate hyper;
@@ -31,7 +32,7 @@ pub async fn create(body: &str, action: &str, pk: &str, sk: &str) -> Result<(Str
     let key: &str;
     let url: String;
 
-    ValidateIfAction::validate_class(action, body)?;
+   // ValidateIfAction::validate_class(action, body)?;
     if action == "tokens" {
         key = pkey;
         url = SECURE_URL.to_string();
@@ -74,7 +75,7 @@ pub async fn create_with_custom_headers(
     let key: &str;
     let url: String;
 
-    ValidateIfAction::validate_class(action, body)?;
+    //ValidateIfAction::validate_class(action, body)?;
     if action == "tokens" {
         key = pkey;
         url = SECURE_URL.to_string();
@@ -117,8 +118,8 @@ pub async fn update(
     let key: &str;
     let url: String;
 
-    ValidateIfAction::validate_id_class(action, query)?;
-    ValidateIfAction::validate_update_class(action, body)?;
+    //ValidateIfAction::validate_id_class(action, query)?;
+    //ValidateIfAction::validate_update_class(action, body)?;
     if action == "tokens" {
         key = pkey;
         url = SECURE_URL.to_string();
@@ -160,9 +161,9 @@ pub async fn create_encrypt(
     rsa_pkey: &str,
     rsa_pid: &str,
 ) -> Result<(String, u16), Box<dyn Error>> {
-    ValidateIfAction::validate_class(action, body)?;
+    //ValidateIfAction::validate_class(action, body)?;
 
-    let body_encrypt = encrypt(body, rsa_pkey, true)?;
+    let body_encrypt: std::collections::HashMap<String, String> = encrypt(body, rsa_pkey, true)?;
 
     let key: &str;
     let url: String;
@@ -213,7 +214,7 @@ pub async fn create_encrypt_with_custom_headers(
     rsa_pid: &str,
     custom_headers: &str,
 ) -> Result<(String, u16), Box<dyn Error>> {
-    ValidateIfAction::validate_class(action, body)?;
+    //ValidateIfAction::validate_class(action, body)?;
 
     let body_encrypt = encrypt(body, rsa_pkey, true)?;
 
@@ -260,7 +261,7 @@ pub async fn create_encrypt_with_custom_headers(
 pub async fn get(action: &str, query: &str, skey: &str) -> Result<(String, u16)> {
     let key: &str;
     let url: String;
-    ValidateIfAction::validate_id_class(action, query)?;
+    //ValidateIfAction::validate_id_class(action, query)?;
     key = skey;
     if action == "plans" || action == "subscriptions" {
         url = BASE_URL.to_owned() + "recurrent/" + action + "/" + query;
@@ -289,7 +290,7 @@ pub async fn get(action: &str, query: &str, skey: &str) -> Result<(String, u16)>
 pub async fn all(action: &str, query: &str, skey: &str) -> Result<(String, u16)> {
     let key: &str;
     let url: String;
-    ValidateIfAction::validate_all_class(action, query)?;
+   // ValidateIfAction::validate_all_class(action, query)?;
 
     let json_value: Value = serde_json::from_str(query).unwrap();
     let query_string = json_value.as_object().map_or(String::new(), |obj| {
@@ -335,7 +336,7 @@ pub async fn all(action: &str, query: &str, skey: &str) -> Result<(String, u16)>
 pub async fn delete(action: &str, query: &str, skey: &str) -> Result<(String, u16)> {
     let key: &str;
     let url: String;
-    ValidateIfAction::validate_id_class(action, query)?;
+    //ValidateIfAction::validate_id_class(action, query)?;
     key = skey; // Asegúrate de definir skey
     if action == "plans" || action == "subscriptions" {
         url = BASE_URL.to_owned() + "recurrent/" + action + "/" + query;
