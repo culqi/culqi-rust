@@ -8,6 +8,9 @@ pub mod culqi {
     pub mod token;
 }
 
+pub mod errors;
+pub use errors::error::CustomRejection; 
+
 extern crate hyper;
 
 use crate::utils::encrypt::encrypt;

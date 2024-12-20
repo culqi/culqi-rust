@@ -1,4 +1,5 @@
-use crate::client::Client;
+use crate::CustomRejection;
+use crate::{client::Client};
 use crate::utils::urls::ORDER_URL;
 extern crate serde_json;
 
@@ -9,21 +10,6 @@ use serde_json::json;
 use warp::{reply, Reply};
 #[derive(Debug, Serialize)]
 pub struct Order {}
-
-#[derive(Debug)] // Agregar la derivación de Debug
-pub struct CustomRejection {
-    status: warp::http::StatusCode,
-    body: String,
-}
-
-impl CustomRejection {
-    pub fn from_status_code(status: warp::http::StatusCode, body: String) -> Self {
-        CustomRejection { status, body }
-    }
-}
-
-impl warp::reject::Reject for CustomRejection {}
-
 impl Order {
     pub async fn create<T: Serialize>(
         client: &Client,
