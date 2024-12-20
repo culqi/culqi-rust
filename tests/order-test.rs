@@ -20,31 +20,24 @@ mod tests {
 
     async fn test_order_create() {
         match Order::create(&client, &create_order_request(), None).await {
-            Ok(reply) => {
-                // Convertir el reply a una respuesta HTTP para extraer el cuerpo
-                let response = reply.into_response();
-                let body_bytes = to_bytes(response.into_body())
-                    .await
-                    .expect("Error al leer el cuerpo de la respuesta");
-                let response_text = String::from_utf8(body_bytes.to_vec())
-                    .expect("Error al convertir el cuerpo a texto UTF-8");
+            Ok((body, status_code)) => {
+                println!("Respuesta de la orden (status code {}): {}", status_code, body);
+                let response_json: Value = match serde_json::from_str(&body) {
+                    Ok(json) => json,
+                    Err(_) => {
+                        panic!("Error al parsear la respuesta JSON");
+                    }
+                };
     
-                println!("Respuesta de la order: {}", response_text);
-    
-                // Parsear la respuesta como JSON
-                let response_json: Value = serde_json::from_str(&response_text)
-                    .expect("Error al parsear la respuesta JSON");
-    
-                // Aserciones
                 assert_eq!(response_json["object"], "order");
                 assert!(
                     response_json["id"].is_string(),
                     "El campo 'id' no es una cadena"
                 );
             }
-            Err(e) => {
-                println!("Error al crear la order: {:?}", e);
-                panic!("La prueba falló debido a un error en Order::create");
+            Err((error_body, error_status)) => {
+                println!("Error al crear la orden: {} (Código de estado: {})", error_body, error_status);
+                panic!("La prueba falló debido a un error al crear la orden");
             }
         }
     }
