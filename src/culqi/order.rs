@@ -18,7 +18,7 @@ pub struct CustomRejection {
 
 impl CustomRejection {
     pub fn from_status_code(status: warp::http::StatusCode, body: String) -> Self {
-        Self { status, body }
+        CustomRejection { status, body }
     }
 }
 
