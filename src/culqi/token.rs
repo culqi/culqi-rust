@@ -1,5 +1,6 @@
 use crate::utils::urls::{TOKEN_URL,TOKEN_YAPE_URL};
 use crate::client::Client;
+use crate::utils::CustomException::CustomException;
 extern crate serde_json;
 
 use serde::Serialize;
@@ -11,9 +12,8 @@ pub struct Token {
 }
 
 impl Token {
-    pub async fn create<T: Serialize>(client: &Client, token_request: &T, custom_header: Option<&str>)  -> Result<impl Reply, warp::Rejection> {
-        let response = client.post(TOKEN_URL, token_request, custom_header).await?;
-        Ok(response)
+    pub async fn create<T: Serialize>(client: &Client, token_request: &T, custom_header: Option<&str>)  -> Result<(String, u16), (String, u16)> {
+        return client.post(TOKEN_URL, token_request, custom_header).await;
     }
 
     pub async fn get(client: &Client, id: &str, custom_header: Option<&str>) -> Result<(String, u16)> {
@@ -31,8 +31,7 @@ impl Token {
         Ok(response)
     }
 
-    pub async fn yape<T: Serialize>(client: &Client, token_request: &T, custom_header: Option<&str>) -> Result<impl Reply, warp::Rejection> {
-        let response = client.post(TOKEN_YAPE_URL, token_request, custom_header).await?;
-        Ok(response)
+    pub async fn yape<T: Serialize>(client: &Client, token_request: &T, custom_header: Option<&str>) -> Result<(String, u16), (String, u16)> {
+        return client.post(TOKEN_YAPE_URL, token_request, custom_header).await;
     }
 }

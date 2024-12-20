@@ -11,10 +11,6 @@ use hyper::header::HeaderName;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::Serialize;
 use serde_json::{from_str, Value};
-
-use warp::http::StatusCode;
-use warp::reply::{self, Response};
-use warp::Reply;
 pub struct Client {
     secret_key: String,
     public_key: String,
@@ -93,82 +89,68 @@ impl Client {
         path: &str,
         body: &T,
         custom_headers: Option<&str>,
-    ) -> Result<impl Reply, warp::Rejection> {
-
-        let mut json_body = serde_json::to_string(body).map_err(|e| {
-            warp::reject::custom(CustomException::new(
-                &format!("Serde error: {}", e).to_string(),
-            ))
+    ) -> Result<(String, u16), (String, u16)> {
+        let mut json_body = serde_json::to_string(body).map_err(|_| {
+            let error = CustomException::new(&"Error al convertir el cuerpo a JSON");
+            (error.to_string(), 400)
         })?;
 
-        ValidateIfAction::validate_class(path, &json_body)?;
-    
-        let is_token = path.contains(TOKEN_URL);
-        let headers_config = match self.get_headers(is_token, custom_headers) {
+        if let Err(validation_error) = ValidateIfAction::validate_class(path, &json_body) {
+            return Err((validation_error.to_string(), 400));
+        }
+
+        let isToken = path.contains(TOKEN_URL);
+        let headers_config = match self.get_headers(isToken, custom_headers) {
             Ok(headers) => headers,
             Err(e) => {
-                return Ok(reply::with_status(
-                    reply::html(e.to_string()),
-                    StatusCode::BAD_REQUEST,
-                ));
+                return Err((e.to_string(), 400));
             }
         };
 
-        // Validación para encriptar
+        // Validacion para encriptar
         if headers_config.contains_key("x-culqi-rsa-id") {
             if let Some(rsa_key) = &self.rsa_key {
-                let encrypted_body = encrypt(&json_body, rsa_key, true).map_err(|e| {
-                    warp::reject::custom(CustomException::new(
-                        &format!("Serde error encrypt: {}", e).to_string(),
-                    ));
-                });
-                json_body = serde_json::to_string(&encrypted_body).map_err(|e| {
-                    warp::reject::custom(CustomException::new(
-                        &format!("Serde error encrypt: {}", e).to_string(),
-                    ))
+                let encrypted_body = encrypt(&json_body, rsa_key, true).map_err(|_| {
+                    let error = CustomException::new(&"Error al encriptar:");
+                    (error.to_string(), 400)
+                })?;
+
+                json_body = serde_json::to_string(&encrypted_body).map_err(|_| {
+                    let error = CustomException::new(&"Error al convertir el cuerpo a JSON");
+                    (error.to_string(), 400)
                 })?;
 
             } else {
                 let error = CustomException::new("Se requiere una clave RSA");
-                return Ok(reply::with_status(
-                    reply::html(error.to_string()),
-                    StatusCode::BAD_REQUEST,
-                ));
+                return Err((error.to_string(), 400));
             }
         }
 
-        let url = get_url(path, is_token);
-        let response = match self
+        let url = get_url(path, isToken);
+        let response = self
             .client
             .post(&url)
             .headers(headers_config)
             .body(json_body)
             .send()
-            .await
-        {
+            .await;
+
+        let response = match response {
             Ok(resp) => resp,
             Err(e) => {
-                eprintln!("Error en la solicitud POST: {}", e);
-                return Ok(reply::with_status(
-                    reply::html(e.to_string()),
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                ));
+                print!("Erro Client");
+                let error = CustomException::new("Error en la solicitud");
+                return Err((error.to_string(), 400));
             }
         };
 
-        let status_code = response.status();
-        let body = match response.text().await {
-            Ok(text) => text,
-            Err(e) => {
-                eprintln!("Error al leer el cuerpo de la respuesta: {}", e);
-                return Ok(reply::with_status(
-                    reply::html("Error al leer el cuerpo de la respuesta".to_string()),
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                ));
-            }
-        };
+        let status_code = response.status().as_u16();
+        let body = response.text().await.unwrap_or_else(|_| "".to_string());
 
-        Ok(reply::with_status(reply::html(body), status_code))
+        match status_code {
+            200..=299 => Ok((body, status_code)),
+            _ => Err((body, status_code)),
+        }
     }
 
     pub async fn get(

@@ -29,21 +29,29 @@ mod tests {
     #[tokio::test]
     async fn test_token_create() {
         match Token::create(&client, &create_token_request(), None).await {
-            Ok((response_text, status_code)) => {
-                println!("Token creado exitosamente con status code: {}", status_code);
-                println!("Respuesta del token: {}", response_text);
-
-                let response_json: Value = serde_json::from_str(&response_text)
-                    .expect("Error al parsear la respuesta JSON");
-
+            Ok((body, status_code)) => {
+                println!(
+                    "Respuesta del token (status code {}): {}",
+                    status_code, body
+                );
+                let response_json: Value = match serde_json::from_str(&body) {
+                    Ok(json) => json,
+                    Err(_) => {
+                        panic!("Error al parsear la respuesta JSON");
+                    }
+                };
                 assert_eq!(response_json["object"], "token");
                 assert!(
                     response_json["id"].is_string(),
                     "El campo 'id' no es una cadena"
                 );
             }
-            Err(e) => {
-                println!("Error al crear el token: {}", e);
+            Err((error_body, error_status)) => {
+                println!(
+                    "Error al crear la orden: {} (Código de estado: {})",
+                    error_body, error_status
+                );
+                panic!("La prueba falló debido a un error al crear la orden");
             }
         }
     }
@@ -55,15 +63,17 @@ mod tests {
         }"#;
         let custom_headers = CUSTOM_HEADERS.replace("{RSA_ID}", RSA_ID);
         match Token::create(&client, &create_token_request(), Some(&custom_headers)).await {
-            Ok((response_text, status_code)) => {
+            Ok((body, status_code)) => {
                 println!(
-                    "Token Encrypt creado exitosamente con status code: {}",
-                    status_code
+                    "Token Encrypt creado exitosamente (status code {}): {}",
+                    status_code, body
                 );
-                println!("Respuesta del token: {}", response_text);
-
-                let response_json: Value = serde_json::from_str(&response_text)
-                    .expect("Error al parsear la respuesta JSON");
+                let response_json: Value = match serde_json::from_str(&body) {
+                    Ok(json) => json,
+                    Err(_) => {
+                        panic!("Error al parsear la respuesta JSON");
+                    }
+                };
 
                 assert_eq!(response_json["object"], "token");
                 assert!(
@@ -71,8 +81,12 @@ mod tests {
                     "El campo 'id' no es una cadena"
                 );
             }
-            Err(e) => {
-                println!("Error al crear el token encriptado: {}", e);
+            Err((error_body, error_status)) => {
+                println!(
+                    "Error al crear la orden: {} (Código de estado: {})",
+                    error_body, error_status
+                );
+                panic!("La prueba falló debido a un error al crear la orden");
             }
         }
     }
@@ -81,10 +95,14 @@ mod tests {
     async fn test_token_get() {
         let token = Token::create(&client, &create_token_request(), None).await;
         match token {
-            Ok((response_text, _status_code)) => {
-                println!("Respuesta crear Token: {}", response_text);
-                let response_json: Value = serde_json::from_str(&response_text)
-                    .expect("Error al parsear la respuesta JSON");
+            Ok((body, status_code)) => {
+                println!(
+                    "Respuesta crear Token (status code {}): {}",
+                    status_code, body
+                );
+
+                let response_json: Value =
+                    serde_json::from_str(&body).expect("Error al parsear la respuesta JSON");
                 if let Some(token_id) = response_json["id"].as_str() {
                     println!("ID del token: {}", token_id);
                     match Token::get(&client, token_id, None).await {
@@ -102,7 +120,13 @@ mod tests {
                     eprintln!("No se encontró el 'id' en la respuesta del servidor");
                 }
             }
-            Err(e) => eprintln!("Error al crear el token: {}", e),
+            Err((error_body, error_status)) => {
+                println!(
+                    "Error al crear Token: {} (Código de estado: {})",
+                    error_body, error_status
+                );
+                panic!("La prueba falló debido a un error al crear la orden");
+            }
         }
     }
 
@@ -155,19 +179,30 @@ mod tests {
                     eprintln!("No se encontró el 'id' en la respuesta del servidor");
                 }
             }
-            Err(e) => eprintln!("Error al crear el token: {}", e),
+            Err((error_body, error_status)) => {
+                println!(
+                    "Error al crear Token: {} (Código de estado: {})",
+                    error_body, error_status
+                );
+                panic!("La prueba falló debido a un error al crear la orden");
+            }
         }
     }
 
     #[tokio::test]
     async fn test_token_yape_create() {
         match Token::yape(&client, &create_token_yape_request(), None).await {
-            Ok((response_text, status_code)) => {
-                println!("Token creado exitosamente con status code: {}", status_code);
-                println!("Respuesta del token: {}", response_text);
-
-                let response_json: Value = serde_json::from_str(&response_text)
-                    .expect("Error al parsear la respuesta JSON");
+            Ok((body, status_code)) => {
+                println!(
+                    "Respuesta del token (status code {}): {}",
+                    status_code, body
+                );
+                let response_json: Value = match serde_json::from_str(&body) {
+                    Ok(json) => json,
+                    Err(_) => {
+                        panic!("Error al parsear la respuesta JSON");
+                    }
+                };
 
                 assert_eq!(response_json["object"], "token");
                 assert!(
@@ -175,10 +210,13 @@ mod tests {
                     "El campo 'id' no es una cadena"
                 );
             }
-            Err(e) => {
-                println!("Error al crear el token: {}", e);
+            Err((error_body, error_status)) => {
+                println!(
+                    "Error al crear la orden: {} (Código de estado: {})",
+                    error_body, error_status
+                );
+                panic!("La prueba falló debido a un error al crear la orden");
             }
         }
     }
-
 }
