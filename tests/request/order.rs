@@ -10,7 +10,7 @@ pub fn create_order_request() -> HashMap<String, serde_json::Value> {
     let order_number = format!("#pedido-{}", timestamp);
 
     let mut order_request = HashMap::new();
-    //order_request.insert("amount".to_string(), json!(10000));
+    order_request.insert("amount".to_string(), json!(10000));
     order_request.insert("currency_code".to_string(), json!("PEN"));
     order_request.insert("description".to_string(), json!("Venta de prueba"));
     order_request.insert("order_number".to_string(), json!(order_number));
