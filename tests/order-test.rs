@@ -20,23 +20,35 @@ mod tests {
 
     async fn test_order_create() {
         match Order::create(&client, &create_order_request(), None).await {
-            Ok((body, status_code)) => {
-                println!("Respuesta de la orden (status code {}): {}", status_code, body);
-                let response_json: Value = match serde_json::from_str(&body) {
+            Ok(response) => {
+                // Verifica que la respuesta sea exitosa (status code 200)
+                let status_code = response.status().as_u16();
+                assert_eq!(status_code, 201, "Código de estado esperado 201, pero obtuviste: {}", status_code);
+
+                let body_bytes = hyper::body::to_bytes(response.into_body()).await.unwrap();
+                let body_string = String::from_utf8_lossy(&body_bytes).to_string();
+
+                println!("Body: {}", body_string);
+    
+                // Verifica que el campo 'object' sea 'order'
+                let response_json: Value = match serde_json::from_str(&body_string) {
                     Ok(json) => json,
                     Err(_) => {
                         panic!("Error al parsear la respuesta JSON");
                     }
                 };
-    
+
                 assert_eq!(response_json["object"], "order");
+
+                // Verifica que el campo 'id' sea una cadena
                 assert!(
                     response_json["id"].is_string(),
                     "El campo 'id' no es una cadena"
                 );
             }
-            Err((error_body, error_status)) => {
-                println!("Error al crear la orden: {} (Código de estado: {})", error_body, error_status);
+            Err(rejection) => {
+                // Si hubo un error, imprímelo y marca el test como fallido
+                println!("Error al crear la orden: {:?}", rejection);
                 panic!("La prueba falló debido a un error al crear la orden");
             }
         }
