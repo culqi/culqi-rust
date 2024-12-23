@@ -2,7 +2,7 @@ use crate::{
     client::Client,
     utils::{
         response::handle_response,
-        urls::{TOKEN_URL, TOKEN_YAPE_URL},
+        urls::{PLAN_CREATE_URL, PLAN_URL},
     },
 };
 extern crate serde_json;
@@ -11,14 +11,14 @@ use serde::Serialize;
 use serde_json::Value;
 
 #[derive(Debug, Serialize,)]
-pub struct Token {}
-impl Token {
+pub struct Plan {}
+impl Plan {
     pub async fn create<T: Serialize,>(
         client: &Client,
-        token_request: &T,
+        plan_request: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.post(TOKEN_URL, token_request, custom_headers,).await;
+        let result = client.post(PLAN_CREATE_URL, plan_request, custom_headers,).await;
         return handle_response(result,).await;
     }
 
@@ -27,7 +27,7 @@ impl Token {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.get(TOKEN_URL, id, custom_headers,).await;
+        let result = client.get(PLAN_URL, id, custom_headers,).await;
         return handle_response(result,).await;
     }
 
@@ -36,26 +36,26 @@ impl Token {
         params: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.all(TOKEN_URL, params, custom_headers,).await;
+        let result = client.all(PLAN_URL, params, custom_headers,).await;
         return handle_response(result,).await;
     }
 
     pub async fn patch<T: Serialize,>(
         client: &Client,
         id: &str,
-        token_request: &T,
+        plan_request: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.patch(TOKEN_URL, id, token_request, custom_headers,).await;
+        let result = client.patch(PLAN_URL, id, plan_request, custom_headers,).await;
         return handle_response(result,).await;
     }
 
-    pub async fn yape<T: Serialize,>(
+    pub async fn delete(
         client: &Client,
-        token_request: &T,
+        id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.post(TOKEN_YAPE_URL, token_request, custom_headers,).await;
+        let result = client.delete(PLAN_URL, &id, custom_headers,).await;
         return handle_response(result,).await;
     }
 }

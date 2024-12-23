@@ -1,9 +1,6 @@
 use crate::{
     client::Client,
-    utils::{
-        response::handle_response,
-        urls::{TOKEN_URL, TOKEN_YAPE_URL},
-    },
+    utils::{response::handle_response, urls::REFUND_URL},
 };
 extern crate serde_json;
 use anyhow::Result;
@@ -11,14 +8,14 @@ use serde::Serialize;
 use serde_json::Value;
 
 #[derive(Debug, Serialize,)]
-pub struct Token {}
-impl Token {
+pub struct Refund {}
+impl Refund {
     pub async fn create<T: Serialize,>(
         client: &Client,
-        token_request: &T,
+        refund_request: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.post(TOKEN_URL, token_request, custom_headers,).await;
+        let result = client.post(REFUND_URL, refund_request, custom_headers,).await;
         return handle_response(result,).await;
     }
 
@@ -27,7 +24,7 @@ impl Token {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.get(TOKEN_URL, id, custom_headers,).await;
+        let result = client.get(REFUND_URL, id, custom_headers,).await;
         return handle_response(result,).await;
     }
 
@@ -36,26 +33,17 @@ impl Token {
         params: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.all(TOKEN_URL, params, custom_headers,).await;
+        let result = client.all(REFUND_URL, params, custom_headers,).await;
         return handle_response(result,).await;
     }
 
     pub async fn patch<T: Serialize,>(
         client: &Client,
         id: &str,
-        token_request: &T,
+        refund_request: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.patch(TOKEN_URL, id, token_request, custom_headers,).await;
-        return handle_response(result,).await;
-    }
-
-    pub async fn yape<T: Serialize,>(
-        client: &Client,
-        token_request: &T,
-        custom_headers: Option<Value,>,
-    ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.post(TOKEN_YAPE_URL, token_request, custom_headers,).await;
+        let result = client.patch(REFUND_URL, id, refund_request, custom_headers,).await;
         return handle_response(result,).await;
     }
 }

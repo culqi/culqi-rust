@@ -2,24 +2,23 @@ use crate::{
     client::Client,
     utils::{
         response::handle_response,
-        urls::{get_url_replace_id, ORDER_CONFIRM_TYPE_URL, ORDER_CONFIRM_URL, ORDER_URL},
+        urls::{get_url_replace_id, CHARGE_CONFIRM_URL, CHARGE_URL},
     },
 };
 extern crate serde_json;
 use anyhow::Result;
 use serde::Serialize;
 use serde_json::{json, Value};
-use warp;
 
 #[derive(Debug, Serialize,)]
-pub struct Order {}
-impl Order {
+pub struct Charge {}
+impl Charge {
     pub async fn create<T: Serialize,>(
         client: &Client,
-        order_request: &T,
+        charge_request: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.post(ORDER_URL, order_request, custom_headers,).await;
+        let result = client.post(CHARGE_URL, charge_request, custom_headers,).await;
         return handle_response(result,).await;
     }
 
@@ -28,7 +27,7 @@ impl Order {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.get(ORDER_URL, &id, custom_headers,).await;
+        let result = client.get(CHARGE_URL, id, custom_headers,).await;
         return handle_response(result,).await;
     }
 
@@ -37,46 +36,28 @@ impl Order {
         params: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.all(ORDER_URL, params, custom_headers,).await;
-        return handle_response(result,).await;
-    }
-
-    pub async fn delete(
-        client: &Client,
-        id: &str,
-        custom_headers: Option<Value,>,
-    ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.delete(ORDER_URL, &id, custom_headers,).await;
+        let result = client.all(CHARGE_URL, params, custom_headers,).await;
         return handle_response(result,).await;
     }
 
     pub async fn patch<T: Serialize,>(
         client: &Client,
         id: &str,
-        order_request: &T,
+        charge_request: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.patch(ORDER_URL, &id, &order_request, custom_headers,).await;
+        let result = client.patch(CHARGE_URL, id, charge_request, custom_headers,).await;
         return handle_response(result,).await;
     }
 
-    pub async fn confirm(
+    pub async fn capture(
         client: &Client,
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let path = get_url_replace_id(ORDER_CONFIRM_URL, id,);
+        let path = get_url_replace_id(CHARGE_CONFIRM_URL, id,);
         let empty_body = json!({});
         let result = client.post(&path, &Some(empty_body,), custom_headers,).await;
-        return handle_response(result,).await;
-    }
-
-    pub async fn type_confirm<T: Serialize,>(
-        client: &Client,
-        order_request: &T,
-        custom_headers: Option<Value,>,
-    ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.post(ORDER_CONFIRM_TYPE_URL, order_request, custom_headers,).await;
         return handle_response(result,).await;
     }
 }
