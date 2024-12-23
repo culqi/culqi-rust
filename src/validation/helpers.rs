@@ -49,7 +49,6 @@ impl Helpers {
 
     pub fn validate_value(value: &str, allowed_values: &[&str],) -> Result<(), CustomException,> {
         if !allowed_values.contains(&value,) {
-            println!("{}", value); // Similar to System.err.println in Java
             return Err(CustomException::new(&format!(
                 "Invalid value. It must be one of {:?}",
                 allowed_values

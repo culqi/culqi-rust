@@ -102,8 +102,6 @@ impl Client {
             }
         }
 
-        println!("Header {:?}", headers);
-
         Ok(headers,)
     }
 
@@ -247,7 +245,6 @@ impl Client {
         },);
 
         let url = format!("{}?{}", get_url(path, false), query);
-        println!("url: {}", url);
         let response = self.client.get(&url,).headers(headers_config,).send().await;
         let response = match response {
             Ok(resp,) => resp,
