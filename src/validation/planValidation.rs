@@ -37,7 +37,6 @@ impl PlanValidation {
                 ));
             }
         } else {
-            println!("entro qui");
             return Err(CustomException::new(
                 "El campo 'interval_unit_time' es inválido o está vacío.",
             ),);
