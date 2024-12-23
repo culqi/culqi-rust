@@ -1,62 +1,82 @@
-use crate::client::Client;
-use crate::utils::urls::ORDER_URL;
-use crate::CustomRejection;
+use crate::{
+    client::Client,
+    utils::{
+        response::handle_response,
+        urls::{get_url_replace_id, ORDER_CONFIRM_TYPE_URL, ORDER_CONFIRM_URL, ORDER_URL},
+    },
+};
 extern crate serde_json;
-
 use anyhow::Result;
-use hyper::Body;
-use warp::http::Response;
 use serde::Serialize;
-use serde_json::json;
-use warp::{reply, Reply};
-#[derive(Debug, Serialize)]
+use serde_json::{json, Value};
+use warp;
+
+#[derive(Debug, Serialize,)]
 pub struct Order {}
 impl Order {
-    pub async fn create<T: Serialize>(
+    pub async fn create<T: Serialize,>(
         client: &Client,
         order_request: &T,
-        custom_header: Option<&str>,
-    ) -> Result<warp::reply::Response, warp::Rejection> {
-        match client.post(ORDER_URL, order_request, custom_header).await {
-            Ok((response_text, status_code)) => {
-                Ok(create_warp_response(response_text, status_code))
-            }
-            Err((error_message, status_code)) => {
-                Ok(create_warp_response(error_message, status_code))
-            }
-        }
+        custom_headers: Option<Value,>,
+    ) -> Result<warp::reply::Response, warp::Rejection,> {
+        let result = client.post(ORDER_URL, order_request, custom_headers,).await;
+        return handle_response(result,).await;
     }
 
     pub async fn get(
         client: &Client,
         id: &str,
-        custom_header: Option<&str>,
-    ) -> Result<(String, u16)> {
-        let response = client.get(ORDER_URL, &id, custom_header).await?;
-        Ok(response)
+        custom_headers: Option<Value,>,
+    ) -> Result<warp::reply::Response, warp::Rejection,> {
+        let result = client.get(ORDER_URL, &id, custom_headers,).await;
+        return handle_response(result,).await;
     }
 
-    pub async fn all(
+    pub async fn all<T: Serialize,>(
         client: &Client,
-        params: &str,
-        custom_header: Option<&str>,
-    ) -> Result<(String, u16)> {
-        let response = client.all(ORDER_URL, params, custom_header).await?;
-        Ok(response)
+        params: &T,
+        custom_headers: Option<Value,>,
+    ) -> Result<warp::reply::Response, warp::Rejection,> {
+        let result = client.all(ORDER_URL, params, custom_headers,).await;
+        return handle_response(result,).await;
     }
 
     pub async fn delete(
         client: &Client,
         id: &str,
-        custom_header: Option<&str>,
-    ) -> Result<(String, u16)> {
-        let response = client.delete(ORDER_URL, &id, custom_header).await?;
-        Ok(response)
+        custom_headers: Option<Value,>,
+    ) -> Result<warp::reply::Response, warp::Rejection,> {
+        let result = client.delete(ORDER_URL, &id, custom_headers,).await;
+        return handle_response(result,).await;
     }
-}
 
-fn create_warp_response(body: String, status_code: u16) -> warp::reply::Response {
-    let status = warp::http::StatusCode::from_u16(status_code)
-        .unwrap_or(warp::http::StatusCode::INTERNAL_SERVER_ERROR);
-    warp::reply::with_status(warp::reply::html(body), status).into_response()
+    pub async fn patch<T: Serialize,>(
+        client: &Client,
+        id: &str,
+        order_request: &T,
+        custom_headers: Option<Value,>,
+    ) -> Result<warp::reply::Response, warp::Rejection,> {
+        let result = client.patch(ORDER_URL, &id, &order_request, custom_headers,).await;
+        return handle_response(result,).await;
+    }
+
+    pub async fn confirm(
+        client: &Client,
+        id: &str,
+        custom_headers: Option<Value,>,
+    ) -> Result<warp::reply::Response, warp::Rejection,> {
+        let path = get_url_replace_id(ORDER_CONFIRM_URL, id,);
+        let empty_body = json!({});
+        let result = client.post(&path, &Some(empty_body,), custom_headers,).await;
+        return handle_response(result,).await;
+    }
+
+    pub async fn type_confirm<T: Serialize,>(
+        client: &Client,
+        order_request: &T,
+        custom_headers: Option<Value,>,
+    ) -> Result<warp::reply::Response, warp::Rejection,> {
+        let result = client.post(ORDER_CONFIRM_TYPE_URL, order_request, custom_headers,).await;
+        return handle_response(result,).await;
+    }
 }
