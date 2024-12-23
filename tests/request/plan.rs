@@ -1,30 +1,57 @@
-pub const REQUEST_PLAN_CREATE: &str = r#"{
-    "short_name": "cp-prueb2442",
-    "description": "Cypress PCI | ERRROR NO USAR",
-    "amount": 300,
-    "currency": "PEN",
-    "interval_unit_time": 1,
-    "interval_count": 1,
-    "initial_cycles": {
-      "count": 1,
-      "has_initial_charge": true,
-      "amount": 400,
-      "interval_unit_time": 1
-    },
-    "name": "CY PCI - ERROR 100018",
-    "metadata":{
-        "key": "value"
-    }
-}"#;
+use std::collections::HashMap;
 
-pub const REQUEST_PLAN_UPDATE: &str = r#"{
-    "short_name": "cp-prueb2442",
-    "description": "Cypress PCI | ERRROR NO USAR",
-    "name": "CY PCI - ERROR 100018",
-}"#;
+use chrono::Utc;
+use serde_json::{json, Value};
 
-pub const REQUEST_PLAN_ALL: &str = r#"{
-    "limit": 100,
-    "status": 1,
-    "before": "pln_live_oUr88s1vYacQ4wI9"
-}"#;
+#[allow(dead_code)]
+pub fn create_plan_request() -> HashMap<String, Value,> {
+    let timestamp = Utc::now().timestamp();
+    let name = format!("Plan-{}", timestamp);
+    let description = format!("Descripción generada - {}", timestamp);
+    let short_name = format!("short-{}", timestamp);
+
+    let mut plan_request = HashMap::new();
+    plan_request.insert("short_name".to_string(), json!(short_name),);
+    plan_request.insert("description".to_string(), json!(description),);
+    plan_request.insert("amount".to_string(), json!(300),);
+    plan_request.insert("currency".to_string(), json!("PEN"),);
+    plan_request.insert("interval_unit_time".to_string(), json!(1),);
+    plan_request.insert("interval_count".to_string(), json!(1),);
+
+    let mut initial_cycles = HashMap::new();
+    initial_cycles.insert("count".to_string(), json!(1),);
+    initial_cycles.insert("has_initial_charge".to_string(), json!(true),);
+    initial_cycles.insert("amount".to_string(), json!(400),);
+    initial_cycles.insert("interval_unit_time".to_string(), json!(1),);
+
+    plan_request.insert("initial_cycles".to_string(), json!(initial_cycles),);
+    plan_request.insert("name".to_string(), json!(name),);
+
+    let mut metadata = HashMap::new();
+    metadata.insert("key".to_string(), json!("value"),);
+    plan_request.insert("metadata".to_string(), json!(metadata),);
+
+    plan_request
+}
+
+#[allow(dead_code)]
+pub fn request_plan_update() -> Value {
+    let timestamp = Utc::now().timestamp();
+    let name = format!("Plan-{}", timestamp);
+    let description = format!("Descripción generada - {}", timestamp);
+    let short_name = format!("short-{}", timestamp);
+
+    json!({
+        "short_name": short_name,
+        "description": description,
+        "name": name
+    })
+}
+
+#[allow(dead_code)]
+pub fn request_plan_all() -> Value {
+    json!({
+        "limit": 1,
+        "status": 1
+    })
+}

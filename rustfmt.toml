@@ -1,0 +1,12 @@
+tab_spaces = 4
+wrap_comments = true
+normalize_comments = true
+struct_field_align_threshold = 50
+chain_width = 80
+max_width = 100
+blank_lines_upper_bound = 1
+blank_lines_lower_bound = 0
+imports_granularity = "Crate"
+reorder_imports = true
+group_imports = "StdExternalCrate"
+trailing_comma = "Always"
