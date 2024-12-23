@@ -1,6 +1,6 @@
 [package]
 name = "BrandoCulqi"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2021"
 description = "API bindings for the Culqi v2 HTTP API"
 authors = ["Team Culqi"]
