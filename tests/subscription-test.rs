@@ -1,89 +1,162 @@
-use tokio;
-use BrandoCulqi::*;
-mod config; // Esto importa el archivo config.rs en la carpeta tests
-use config::credentials::{PUBLIC_KEY, SECRET_KEY};
-mod request {
-    pub mod subscription;
-}
-use request::subscription::{
-    REQUEST_SUBSCRIṔTTION_ALL, REQUEST_SUBSCRIṔTTION_CREATE, REQUEST_SUBSCRIṔTTION_UPDATE,
-};
+use BrandoCulqi::culqi::subscription::Subscription;
+mod config;
+mod header;
+mod request;
+mod utils;
 
 #[cfg(test)]
 mod tests {
+    use header::header_rsa;
+    use request::subscription::{
+        create_subscription_request, request_subscription_all, update_subscription_request,
+    };
+    use serial_test::serial;
+    use utils::{subscription, util};
+
     use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
     #[tokio::test]
+    #[serial]
     async fn test_subscription_create() {
-        match create(
-            REQUEST_SUBSCRIṔTTION_CREATE,
-            "subscriptions",
-            PUBLIC_KEY,
-            SECRET_KEY,
+        println!("Crear Subscription -> ");
+        match Subscription::create(
+            &util::create_client(),
+            &create_subscription_request().await,
+            None,
         )
         .await
         {
-            Ok((response_text, status_code)) => {
-                println!("Status Code: {}", status_code);
-                println!("Response Text: {}", response_text);
-                assert_eq!(status_code, 201, "Expected status code 201");
+            Ok(response,) => {
+                util::assert_status(&response, 201,);
+                let response_json = util::parse_response_body(response,).await;
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
             }
-            Err(err) => println!("{:?}", err),
+            Err(rejection,) => {
+                println!("Error al crear el subscription: {:?}", rejection);
+                panic!("La prueba falló debido a un error al crear la subscription");
+            }
         }
     }
 
     #[tokio::test]
+    #[serial]
+    async fn test_subscription_create_encrypt() {
+        println!("Crear Subscription con llaves RSA -> ");
+        match Subscription::create(
+            &util::create_client_encrypt(),
+            &create_subscription_request().await,
+            Some(header_rsa::get_header_encrypt(),),
+        )
+        .await
+        {
+            Ok(response,) => {
+                util::assert_status(&response, 201,);
+                let response_json = util::parse_response_body(response,).await;
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
+            }
+            Err(rejection,) => {
+                println!("Error al crear el subscription: {:?}", rejection);
+                panic!("La prueba falló debido a un error al crear el subscription");
+            }
+        }
+    }
+
+    #[tokio::test]
+    #[serial]
     async fn test_subscription_update() {
-        match update(
-            REQUEST_SUBSCRIṔTTION_UPDATE,
-            "subscriptions",
-            "sxn_live_neFrhLr8QvozBdWn",
-            PUBLIC_KEY,
-            SECRET_KEY,
+        println!("Crear Subscription -> ");
+        let subscription_id = subscription::create_subscription().await;
+        println!("Actualizar Subscription -> ");
+        match Subscription::patch(
+            &util::create_client(),
+            &subscription_id,
+            &update_subscription_request().await,
+            None,
         )
         .await
         {
-            Ok((response_text, status_code)) => {
-                println!("Status Code: {}", status_code);
-                println!("Response Text: {}", response_text);
-                assert_eq!(status_code, 200, "Expected status code 201");
+            Ok(response,) => {
+                util::assert_status(&response, 200,);
+                let response_json = util::parse_response_body(response,).await;
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
             }
-            Err(err) => println!("{:?}", err),
+            Err(rejection,) => {
+                println!("Error al eliminar el subscription: {:?}", rejection);
+                panic!("La prueba falló debido a un error al eliminar el subscription");
+            }
         }
     }
 
     #[tokio::test]
-    async fn test_subscription_all() {
-        match all("subscriptions", REQUEST_SUBSCRIṔTTION_ALL, SECRET_KEY).await {
-            Ok((response_text, _status_code)) => {
-                println!("Respuesta del servidor: {}", response_text)
-            }
-            Err(e) => eprintln!("Error: {}", e),
-        }
-    }
-
-    #[tokio::test]
+    #[serial]
     async fn test_subscription_get() {
-        match get("subscriptions", "sxn_live_neFrhLrX8vozBdWn", SECRET_KEY).await {
-            Ok((response_text, _status_code)) => {
-                println!("Respuesta del servidor: {}", response_text)
+        println!("Crear Subscription -> ");
+        let subscription_id = subscription::create_subscription().await;
+        println!("Obtener Subscription por Id {:?} -> ", subscription_id);
+        match Subscription::get(&util::create_client(), &subscription_id, None,).await {
+            Ok(response,) => {
+                util::assert_status(&response, 200,);
+                let response_json = util::parse_response_body(response,).await;
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
             }
-            Err(e) => eprintln!("Error: {}", e),
+            Err(rejection,) => {
+                println!("Error al obtener subscription por id: {:?}", rejection);
+                panic!("La prueba falló debido a un error al obtener subscription por id");
+            }
         }
     }
 
     #[tokio::test]
-    async fn test_subscription_delete() {
-        match delete("subscriptions", "sxn_live_neFrh8rXQvozBdWn", SECRET_KEY).await {
-            Ok((response_text, _status_code)) => {
-                println!("Respuesta del servidor: {}", response_text)
+    #[serial]
+    async fn test_subscription_all() {
+        println!("Listar Subscription -> ");
+        match Subscription::all(&util::create_client(), &request_subscription_all(), None,).await {
+            Ok(response,) => {
+                util::assert_status(&response, 200,);
+                let response_json: serde_json::Value = util::parse_response_body(response,).await;
+                assert!(
+                    response_json["paging"].is_object(),
+                    "El campo 'paging' debe ser type object"
+                );
             }
-            Err(e) => eprintln!("Error: {}", e),
+            Err(rejection,) => {
+                println!("Error al listar subscription: {:?}", rejection);
+                panic!("La prueba falló debido a un error al listar subscription");
+            }
+        }
+    }
+
+    #[tokio::test]
+    #[serial]
+    async fn test_subscription_delete() {
+        println!("Listar Subscription -> ");
+        let subscription_id = subscription::create_subscription().await;
+        println!("Eliminar Subscription por Id {:?} -> ", subscription_id);
+        match Subscription::delete(&util::create_client(), &subscription_id, None,).await {
+            Ok(response,) => {
+                util::assert_status(&response, 200,);
+                let response_json: serde_json::Value = util::parse_response_body(response,).await;
+                assert_eq!(response_json["deleted"], true);
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
+            }
+            Err(rejection,) => {
+                println!("Error al eliminar el subscription: {:?}", rejection);
+                panic!("La prueba falló debido a un error al eliminar el subscription");
+            }
         }
     }
 }

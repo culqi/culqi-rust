@@ -36,3 +36,4 @@ serde = { version = "1.0.216", features = ["derive"] }
 anyhow = "1.0.94"
 lazy_static = "1.4"
 warp = "0.3"
+serial_test = "0.5"

@@ -1,221 +1,151 @@
-use tokio;
-use BrandoCulqi::*;
-mod config;
-use config::credentials::{PUBLIC_KEY, RSA_ID, RSA_KEY, SECRET_KEY};
-use BrandoCulqi::client::Client;
 use BrandoCulqi::culqi::token::Token;
-
+mod config;
+mod header;
 mod request;
-use request::token::{
-    create_token_request, create_token_yape_request, update_token_request, LIST_TOKEN_REQUEST,
-};
-
-use lazy_static::lazy_static;
-lazy_static! {
-    static ref client: Client = Client::config(SECRET_KEY, PUBLIC_KEY, Some(RSA_KEY));
-}
-use serde_json::Value;
+mod utils;
+use request::token::{create_token_request, create_token_yape_request, update_token_request};
 
 #[cfg(test)]
 mod tests {
+    use header::header_rsa;
+    use request::token::request_token_all;
+    use serial_test::serial;
+    use utils::{token, util};
+
     use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-
     #[tokio::test]
+    #[serial]
     async fn test_token_create() {
-        match Token::create(&client, &create_token_request(), None).await {
-            Ok((body, status_code)) => {
-                println!(
-                    "Respuesta del token (status code {}): {}",
-                    status_code, body
-                );
-                let response_json: Value = match serde_json::from_str(&body) {
-                    Ok(json) => json,
-                    Err(_) => {
-                        panic!("Error al parsear la respuesta JSON");
-                    }
-                };
+        println!("Crear Token -> ");
+        match Token::create(&util::create_client(), &create_token_request(), None,).await {
+            Ok(response,) => {
+                util::assert_status(&response, 201,);
+                let response_json = util::parse_response_body(response,).await;
                 assert_eq!(response_json["object"], "token");
                 assert!(
                     response_json["id"].is_string(),
                     "El campo 'id' no es una cadena"
                 );
             }
-            Err((error_body, error_status)) => {
-                println!(
-                    "Error al crear la orden: {} (Código de estado: {})",
-                    error_body, error_status
-                );
-                panic!("La prueba falló debido a un error al crear la orden");
+            Err(rejection,) => {
+                println!("Error al crear el token: {:?}", rejection);
+                panic!("La prueba falló debido a un error al crear  el token");
             }
         }
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_token_create_encrypt() {
-        const CUSTOM_HEADERS: &str = r#"{
-            "x-culqi-rsa-id": "{RSA_ID}"
-        }"#;
-        let custom_headers = CUSTOM_HEADERS.replace("{RSA_ID}", RSA_ID);
-        match Token::create(&client, &create_token_request(), Some(&custom_headers)).await {
-            Ok((body, status_code)) => {
-                println!(
-                    "Token Encrypt creado exitosamente (status code {}): {}",
-                    status_code, body
-                );
-                let response_json: Value = match serde_json::from_str(&body) {
-                    Ok(json) => json,
-                    Err(_) => {
-                        panic!("Error al parsear la respuesta JSON");
-                    }
-                };
-
+        println!("Crear Token con llaves RSA-> ");
+        match Token::create(
+            &util::create_client_encrypt(),
+            &create_token_request(),
+            Some(header_rsa::get_header_encrypt(),),
+        )
+        .await
+        {
+            Ok(response,) => {
+                util::assert_status(&response, 201,);
+                let response_json = util::parse_response_body(response,).await;
                 assert_eq!(response_json["object"], "token");
                 assert!(
                     response_json["id"].is_string(),
                     "El campo 'id' no es una cadena"
                 );
             }
-            Err((error_body, error_status)) => {
-                println!(
-                    "Error al crear la orden: {} (Código de estado: {})",
-                    error_body, error_status
-                );
-                panic!("La prueba falló debido a un error al crear la orden");
+            Err(rejection,) => {
+                println!("Error al crear el token: {:?} encriptada", rejection);
+                panic!("La prueba falló debido a un error al crear el token encriptada");
             }
         }
     }
 
     #[tokio::test]
     async fn test_token_get() {
-        let token = Token::create(&client, &create_token_request(), None).await;
-        match token {
-            Ok((body, status_code)) => {
-                println!(
-                    "Respuesta crear Token (status code {}): {}",
-                    status_code, body
-                );
-
-                let response_json: Value =
-                    serde_json::from_str(&body).expect("Error al parsear la respuesta JSON");
-                if let Some(token_id) = response_json["id"].as_str() {
-                    println!("ID del token: {}", token_id);
-                    match Token::get(&client, token_id, None).await {
-                        Ok((response_text, _status_code)) => {
-                            println!("Respuesta del GET token: {}", response_text);
-                            assert_eq!(response_json["object"], "token");
-                            assert!(
-                                response_json["id"].is_string(),
-                                "El campo 'id' no es una cadena"
-                            );
-                        }
-                        Err(e) => eprintln!("Error al obtener el token: {}", e),
-                    }
-                } else {
-                    eprintln!("No se encontró el 'id' en la respuesta del servidor");
-                }
-            }
-            Err((error_body, error_status)) => {
-                println!(
-                    "Error al crear Token: {} (Código de estado: {})",
-                    error_body, error_status
-                );
-                panic!("La prueba falló debido a un error al crear la orden");
-            }
-        }
-    }
-
-    #[tokio::test]
-    async fn test_token_list() {
-        match Token::all(&client, LIST_TOKEN_REQUEST, None).await {
-            Ok((response_text, status_code)) => {
-                println!(
-                    "Token Encrypt creado exitosamente con status code: {}",
-                    status_code
-                );
-                println!("Respuesta del token: {}", response_text);
-
-                let response_json: Value = serde_json::from_str(&response_text)
-                    .expect("Error al parsear la respuesta JSON");
-
-                assert!(
-                    response_json["paging"].is_object(),
-                    "El campo 'paging' debe ser 'object'"
-                );
-            }
-            Err(e) => {
-                println!("Error al crear el token encriptado: {}", e);
-            }
-        }
-    }
-
-    #[tokio::test]
-    async fn test_token_update() {
-        let token = Token::create(&client, &create_token_request(), None).await;
-        match token {
-            Ok((response_text, _status_code)) => {
-                println!("Respuesta crear Token: {}", response_text);
-                let response_json: Value = serde_json::from_str(&response_text)
-                    .expect("Error al parsear la respuesta JSON");
-                if let Some(token_id) = response_json["id"].as_str() {
-                    println!("ID del token: {}", token_id);
-                    match Token::patch(&client, token_id, &update_token_request(), None).await {
-                        Ok((response_text, _status_code)) => {
-                            println!("Respuesta del UPDATE token: {}", response_text);
-                            assert_eq!(response_json["object"], "token");
-                            assert!(
-                                response_json["id"].is_string(),
-                                "El campo 'id' no es una cadena"
-                            );
-                        }
-                        Err(e) => eprintln!("Error al obtener el token: {}", e),
-                    }
-                } else {
-                    eprintln!("No se encontró el 'id' en la respuesta del servidor");
-                }
-            }
-            Err((error_body, error_status)) => {
-                println!(
-                    "Error al crear Token: {} (Código de estado: {})",
-                    error_body, error_status
-                );
-                panic!("La prueba falló debido a un error al crear la orden");
-            }
-        }
-    }
-
-    #[tokio::test]
-    async fn test_token_yape_create() {
-        match Token::yape(&client, &create_token_yape_request(), None).await {
-            Ok((body, status_code)) => {
-                println!(
-                    "Respuesta del token (status code {}): {}",
-                    status_code, body
-                );
-                let response_json: Value = match serde_json::from_str(&body) {
-                    Ok(json) => json,
-                    Err(_) => {
-                        panic!("Error al parsear la respuesta JSON");
-                    }
-                };
-
+        println!("Crear Token -> ");
+        let token_id = token::create_token().await;
+        println!("Obtener Token por Id {:?} -> ", token_id);
+        match Token::get(&util::create_client(), &token_id, None,).await {
+            Ok(response,) => {
+                util::assert_status(&response, 200,);
+                let response_json = util::parse_response_body(response,).await;
                 assert_eq!(response_json["object"], "token");
                 assert!(
                     response_json["id"].is_string(),
                     "El campo 'id' no es una cadena"
                 );
             }
-            Err((error_body, error_status)) => {
-                println!(
-                    "Error al crear la orden: {} (Código de estado: {})",
-                    error_body, error_status
+            Err(rejection,) => {
+                println!("Error al obtener el token por id: {:?}", rejection);
+                panic!("La prueba falló debido a un error al obtener el token por id");
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_token_list() {
+        println!("Listar Token -> ");
+        match Token::all(&util::create_client(), &request_token_all(), None,).await {
+            Ok(response,) => {
+                util::assert_status(&response, 200,);
+                let response_json = util::parse_response_body(response,).await;
+                assert!(
+                    response_json["paging"].is_object(),
+                    "El campo 'paging' debe ser type object"
                 );
-                panic!("La prueba falló debido a un error al crear la orden");
+            }
+            Err(rejection,) => {
+                println!("Error al listar token: {:?}", rejection);
+                panic!("La prueba falló debido a un error al listar token");
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_token_update() {
+        println!("Crear Token -> ");
+        let token_id = token::create_token().await;
+        println!("Obtener Token por Id {:?} -> ", token_id);
+        match Token::patch(
+            &util::create_client(),
+            &token_id,
+            &update_token_request(),
+            None,
+        )
+        .await
+        {
+            Ok(response,) => {
+                util::assert_status(&response, 200,);
+                let response_json = util::parse_response_body(response,).await;
+                assert_eq!(response_json["object"], "token");
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
+            }
+            Err(rejection,) => {
+                println!("Error al actualizar el token: {:?}", rejection);
+                panic!("La prueba falló debido a un error al actualizar el token");
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_token_yape_create() {
+        match Token::yape(&util::create_client(), &create_token_yape_request(), None,).await {
+            Ok(response,) => {
+                util::assert_status(&response, 201,);
+                let response_json = util::parse_response_body(response,).await;
+                assert_eq!(response_json["object"], "token");
+                assert!(
+                    response_json["id"].is_string(),
+                    "El campo 'id' no es una cadena"
+                );
+            }
+            Err(rejection,) => {
+                println!("Error al crear token de yape: {:?}", rejection);
+                panic!("La prueba falló debido a un error al crear token de yape");
             }
         }
     }
