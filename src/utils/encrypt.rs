@@ -1,10 +1,10 @@
 use std::{collections::HashMap, error::Error, fmt, io::Error as IoError, string::FromUtf8Error};
 
 use aes_gcm::{
-    aead::{generic_array::GenericArray, Aead, NewAead},
-    Aes256Gcm,
+    aead::{generic_array::GenericArray, Aead},
+    Aes256Gcm, KeyInit,
 };
-use base64::{encode, DecodeError};
+use base64::{engine::general_purpose, DecodeError, Engine};
 // use rsa::{PublicKey};
 use openssl::encrypt::Encrypter;
 use openssl::{
@@ -116,10 +116,10 @@ pub fn encrypt(
         data.into() // or handle non-JSON data as needed
     };
     // Generate a 256-bit random key for AES encryption
-    let key: [u8; 32] = rand::thread_rng().gen();
+    let key: [u8; 32] = rand::thread_rng().r#gen();
 
     // GCM mode requires a 96-bit (12 bytes) random initialization vector
-    let iv: [u8; 12] = rand::thread_rng().gen();
+    let iv: [u8; 12] = rand::thread_rng().r#gen();
 
     let cipher = Aes256Gcm::new(GenericArray::from_slice(&key,),);
     let nonce = GenericArray::from_slice(&iv,);
@@ -132,7 +132,7 @@ pub fn encrypt(
     ciphertext = Vec::from(&ciphertext[..ciphertext.len() - 16],);
 
     // Convert encrypted data to base64 string
-    let encrypted_data = encode(&ciphertext,);
+    let encrypted_data = general_purpose::STANDARD.encode(&ciphertext,);
 
     let public_key = Rsa::public_key_from_pem(rsa_public_key.as_bytes(),).unwrap();
     let public_key = PKey::from_rsa(public_key,).unwrap();
@@ -158,8 +158,8 @@ pub fn encrypt(
     let encrypted_len = encrypter.encrypt(&iv, &mut encrypted_iv,).unwrap();
     encrypted_iv.truncate(encrypted_len,);
 
-    let encrypted_key_b64 = encode(&encrypted_key,);
-    let encrypted_iv_b64 = encode(&encrypted_iv,);
+    let encrypted_key_b64 = general_purpose::STANDARD.encode(&encrypted_key,);
+    let encrypted_iv_b64 = general_purpose::STANDARD.encode(&encrypted_iv,);
 
     let mut map = HashMap::new();
     map.insert("encrypted_data".to_string(), encrypted_data,);
