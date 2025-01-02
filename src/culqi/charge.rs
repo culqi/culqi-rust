@@ -2,13 +2,13 @@ use crate::{
     client::Client,
     utils::{
         response::handle_response,
-        urls::{get_url_replace_id, CHARGE_CONFIRM_URL, CHARGE_URL},
+        urls::{CHARGE_CONFIRM_URL, CHARGE_URL, get_url_replace_id},
     },
 };
 extern crate serde_json;
 use anyhow::Result;
 use serde::Serialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[derive(Debug, Serialize,)]
 pub struct Charge {}

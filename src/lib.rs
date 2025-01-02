@@ -3,7 +3,6 @@
 
 // private module
 mod utils;
-mod validation;
 
 // public module
 pub mod client;

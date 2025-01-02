@@ -1,4 +1,4 @@
-use warp::{http::StatusCode, reply::Response, Reply};
+use warp::{Reply, http::StatusCode, reply::Response};
 
 pub fn create_warp_response(body: String, status_code: u16,) -> Response {
     let status = StatusCode::from_u16(status_code,).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR,);
