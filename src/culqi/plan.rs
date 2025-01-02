@@ -19,7 +19,7 @@ impl Plan {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.post(PLAN_CREATE_URL, plan_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn get(
@@ -28,7 +28,7 @@ impl Plan {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.get(PLAN_URL, id, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn all<T: Serialize,>(
@@ -37,7 +37,7 @@ impl Plan {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.all(PLAN_URL, params, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn patch<T: Serialize,>(
@@ -47,7 +47,7 @@ impl Plan {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.patch(PLAN_URL, id, plan_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn delete(
@@ -55,7 +55,7 @@ impl Plan {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.delete(PLAN_URL, &id, custom_headers,).await;
-        return handle_response(result,).await;
+        let result = client.delete(PLAN_URL, id, custom_headers,).await;
+        handle_response(result,).await
     }
 }

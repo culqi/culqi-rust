@@ -16,7 +16,7 @@ impl Refund {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.post(REFUND_URL, refund_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn get(
@@ -25,7 +25,7 @@ impl Refund {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.get(REFUND_URL, id, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn all<T: Serialize,>(
@@ -34,7 +34,7 @@ impl Refund {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.all(REFUND_URL, params, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn patch<T: Serialize,>(
@@ -44,6 +44,6 @@ impl Refund {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.patch(REFUND_URL, id, refund_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 }

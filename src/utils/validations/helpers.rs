@@ -17,10 +17,10 @@ impl Helpers {
     ) -> Result<(), CustomException,> {
         if let Some(value,) = parsed.get(key,).and_then(|v| v.as_str(),) {
             Self::validate_start(value, expected_prefix,)?;
-            Ok((),)
-        } else {
-            return Err(CustomException::new(&error::validate_key_id(key,),),);
+            return Ok((),);
         }
+
+        Err(CustomException::new(&error::validate_key_id(key,),),)
     }
 
     pub fn validate_allow_values_string(
@@ -62,7 +62,7 @@ impl Helpers {
         value: &str,
         allowed_values: &[&str],
     ) -> Result<(), CustomException,> {
-        if !&allowed_values.contains(&&value.trim(),) {
+        if !&allowed_values.contains(&value.trim(),) {
             return Err(CustomException::new(&error::validate_allow_values(
                 allowed_values,
             ),),);
@@ -85,14 +85,12 @@ impl Helpers {
         value: &serde_json::Value,
         parameter: &str,
     ) -> Result<(), CustomException,> {
-        if let Some(_,) = value.as_f64() {
-            return Ok((),);
-        } else if let Some(_,) = value.as_i64() {
+        if value.as_f64().is_some() || value.as_i64().is_some() {
             Ok((),)
         } else {
-            return Err(CustomException::new(&error::validate_type_value(
+            Err(CustomException::new(&error::validate_type_value(
                 parameter, "numeric",
-            ),),);
+            ),),)
         }
     }
 
@@ -109,9 +107,9 @@ impl Helpers {
             }
             Ok((),)
         } else {
-            return Err(CustomException::new(&error::validate_type_value(
+            Err(CustomException::new(&error::validate_type_value(
                 parameter, "string",
-            ),),);
+            ),),)
         }
     }
 
@@ -138,7 +136,7 @@ impl Helpers {
 
             if let (Some(from_i64,), Some(to_i64,),) = (from_i64, to_i64,) {
                 if to_i64 < from_i64 {
-                    return Err(CustomException::new(&error::ERROR_FILTER_DATE,),);
+                    return Err(CustomException::new(error::ERROR_FILTER_DATE,),);
                 }
             } else {
                 return Err(CustomException::new(
@@ -171,7 +169,7 @@ impl Helpers {
     ) -> Result<(), CustomException,> {
         for field in &required_payload {
             if let Some(value,) = parsed.get(*field,) {
-                Helpers::validate_numeric(value, *field,)?;
+                Helpers::validate_numeric(value, field,)?;
             } else {
                 return Err(CustomException::new(&error::not_present_parameter(field,),),);
             }
@@ -186,7 +184,7 @@ impl Helpers {
     ) -> Result<(), CustomException,> {
         for field in &required_payload {
             if let Some(value,) = parsed.get(*field,) {
-                Helpers::validate_string(value, *field,)?;
+                Helpers::validate_string(value, field,)?;
             } else {
                 return Err(CustomException::new(&error::not_present_parameter(field,),),);
             }
@@ -199,13 +197,13 @@ impl Helpers {
         if let Some(value,) = parsed.get(constant::EMAIL,).and_then(|v| v.as_str(),) {
             let re = Regex::new(regex_pattern::EMAIL,).unwrap();
             if !re.is_match(value,) {
-                return Err(CustomException::new(&error::INVALID_EMAIL,),);
+                return Err(CustomException::new(error::INVALID_EMAIL,),);
             }
             Ok((),)
         } else {
-            return Err(CustomException::new(&error::not_present_parameter(
+            Err(CustomException::new(&error::not_present_parameter(
                 constant::EMAIL,
-            ),),);
+            ),),)
         }
     }
 
@@ -234,7 +232,7 @@ impl Helpers {
             if let Some(card_number,) = value.as_str() {
                 let re = Regex::new(regex_pattern::CARD_NUMBER,).unwrap();
                 if !re.is_match(card_number,) {
-                    return Err(CustomException::new(&error::INVALID_CARD_NUMBER,),);
+                    return Err(CustomException::new(error::INVALID_CARD_NUMBER,),);
                 }
                 Ok((),)
             } else {
@@ -243,9 +241,9 @@ impl Helpers {
                 ),),)
             }
         } else {
-            return Err(CustomException::new(&error::not_present_parameter(
+            Err(CustomException::new(&error::not_present_parameter(
                 constant::CARD_NUMBER,
-            ),),);
+            ),),)
         }
     }
 
@@ -254,7 +252,7 @@ impl Helpers {
             if let Some(cvv,) = value.as_str() {
                 let re = Regex::new(regex_pattern::CVV,).unwrap();
                 if !re.is_match(cvv,) {
-                    return Err(CustomException::new(&error::INVALID_CVV,),);
+                    return Err(CustomException::new(error::INVALID_CVV,),);
                 }
                 Ok((),)
             } else {
@@ -263,9 +261,9 @@ impl Helpers {
                 ),)
             }
         } else {
-            return Err(CustomException::new(&error::not_present_parameter(
+            Err(CustomException::new(&error::not_present_parameter(
                 constant::CVV,
-            ),),);
+            ),),)
         }
     }
 
@@ -274,7 +272,7 @@ impl Helpers {
             if let Some(month,) = value.as_str() {
                 let re = Regex::new(regex_pattern::MONTH,).unwrap();
                 if !re.is_match(month,) {
-                    return Err(CustomException::new(&error::INVALID_MONTH,),);
+                    return Err(CustomException::new(error::INVALID_MONTH,),);
                 }
                 Ok((),)
             } else {
@@ -283,9 +281,9 @@ impl Helpers {
                 ),),)
             }
         } else {
-            return Err(CustomException::new(&error::not_present_parameter(
+            Err(CustomException::new(&error::not_present_parameter(
                 constant::EXPIRATION_MONTH,
-            ),),);
+            ),),)
         }
     }
 
@@ -294,7 +292,7 @@ impl Helpers {
             if let Some(year,) = value.as_str() {
                 let re = Regex::new(regex_pattern::YEAR,).unwrap();
                 if !re.is_match(year,) {
-                    return Err(CustomException::new(&error::INVALID_YEAR,),);
+                    return Err(CustomException::new(error::INVALID_YEAR,),);
                 }
                 Ok((),)
             } else {
@@ -303,9 +301,9 @@ impl Helpers {
                 ),),)
             }
         } else {
-            return Err(CustomException::new(&error::not_present_parameter(
+            Err(CustomException::new(&error::not_present_parameter(
                 constant::EXPIRATION_YEAR,
-            ),),);
+            ),),)
         }
     }
 
@@ -313,7 +311,7 @@ impl Helpers {
         if let Some(currency_code,) = parsed.get(constant::CURRENCY_CODE,).and_then(|v| v.as_str(),)
         {
             if !constant::ALLOW_VALUES_CURRENCY_CODE.contains(&currency_code,) {
-                return Err(CustomException::new(&error::INVALID_CURRENCY_CODE,),);
+                return Err(CustomException::new(error::INVALID_CURRENCY_CODE,),);
             }
         } else {
             return Err(CustomException::new(&error::not_present_parameter(
@@ -335,11 +333,11 @@ impl Helpers {
                 Self::validate_start(value, expected_prefix,)?;
                 return Ok((),);
             }
-            return Err(CustomException::new(&error::validate_allow_values(
+            Err(CustomException::new(&error::validate_allow_values(
                 expected_prefixs,
-            ),),);
+            ),),)
         } else {
-            return Err(CustomException::new(&error::not_present_parameter(value,),),);
+            Err(CustomException::new(&error::not_present_parameter(value,),),)
         }
     }
 

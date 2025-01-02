@@ -27,7 +27,7 @@ impl SubscriptionValidation {
             subscription::ALLOW_VALUES_STATUS,
         )?;
 
-        if let Some(_,) = parsed.get(constant::PLAN_ID,) {
+        if parsed.get(constant::PLAN_ID,).is_some() {
             Helpers::validate_field(&parsed, constant::PLAN_ID, constant::PLAN_KEY,)?;
         }
 
@@ -47,7 +47,7 @@ impl SubscriptionValidation {
 
     pub fn update(body: &str,) -> Result<(), CustomException,> {
         let parsed: Value = serde_json::from_str(body,)?;
-        if let Some(_,) = parsed.get("card_id",) {
+        if parsed.get("card_id",).is_some() {
             Helpers::validate_field(&parsed, constant::CARD_ID, constant::CARD_KEY,)?;
         }
 

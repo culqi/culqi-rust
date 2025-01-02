@@ -20,7 +20,7 @@ impl OrderValidation {
         if let Some(client_details,) = parsed.get("client_details",) {
             Helpers::validate_parameters_string(
                 vec!["first_name", "last_name", "phone_number", "email"],
-                &client_details,
+                client_details,
             )?;
             Helpers::is_valid_email(client_details,)?;
         } else {
@@ -47,7 +47,7 @@ impl OrderValidation {
                 if let Some(order_type_str,) = order_type.as_str() {
                     if !constant::ALLOW_VALUES_ORDER_TYPES.contains(&order_type_str,) {
                         return Err(CustomException::new(&error::validate_allow_values(
-                            &constant::ALLOW_VALUES_ORDER_TYPES,
+                            constant::ALLOW_VALUES_ORDER_TYPES,
                         ),),);
                     }
                 } else {

@@ -25,7 +25,7 @@ impl Subscription {
                 custom_headers,
             )
             .await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn get(
@@ -34,7 +34,7 @@ impl Subscription {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.get(SUBSCRIPTION_URL, id, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn all<T: Serialize,>(
@@ -43,7 +43,7 @@ impl Subscription {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.all(SUBSCRIPTION_URL, params, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn patch<T: Serialize,>(
@@ -54,7 +54,7 @@ impl Subscription {
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result =
             client.patch(SUBSCRIPTION_URL, id, subscription_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn delete(
@@ -62,7 +62,7 @@ impl Subscription {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.delete(SUBSCRIPTION_URL, &id, custom_headers,).await;
-        return handle_response(result,).await;
+        let result = client.delete(SUBSCRIPTION_URL, id, custom_headers,).await;
+        handle_response(result,).await
     }
 }

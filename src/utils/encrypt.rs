@@ -101,7 +101,7 @@ pub fn encrypt(
     println!("Initializing Encrypter...");
 
     let json_data: Value = if is_json {
-        serde_json::from_str(&data,)?
+        serde_json::from_str(data,)?
     } else {
         data.into()
     };
