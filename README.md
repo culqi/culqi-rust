@@ -26,7 +26,7 @@ Agregar la siguiente dependencia en tu arhivo `Cargo.toml` (Ultima version):
 
 ```toml
 [dependencies]
-culqi = "1.0.2"
+LibCulqi = "1.0.2"
 ```
 
 O ejecuta el sisguiente comando `Cargo.toml`:
