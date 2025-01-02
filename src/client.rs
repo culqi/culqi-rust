@@ -165,7 +165,7 @@ impl Client {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<(String, u16,), (String, u16,),> {
-        Validation::resource_id(path, &id,)?;
+        Validation::resource_id(path, id,)?;
 
         let headers_config = match self.get_headers(false, custom_headers,) {
             Ok(headers,) => headers,
@@ -255,7 +255,7 @@ impl Client {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<(String, u16,), (String, u16,),> {
-        Validation::resource_id(path, &id,)?;
+        Validation::resource_id(path, id,)?;
 
         let headers_config = match self.get_headers(false, custom_headers,) {
             Ok(headers,) => headers,
@@ -294,7 +294,7 @@ impl Client {
             (error.to_string(), 400,)
         },)?;
 
-        Validation::resource_id(path, &id,)?;
+        Validation::resource_id(path, id,)?;
         Validation::update(path, &json_body,)?;
 
         let headers_config = match self.get_headers(false, custom_headers,) {

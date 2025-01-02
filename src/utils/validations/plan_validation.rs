@@ -42,7 +42,7 @@ impl PlanValidation {
         if let Some(initial_cycles,) = parsed.get("initial_cycles",) {
             Helpers::validate_parameters_numeric(
                 vec!["count", "amount", "interval_unit_time"],
-                &initial_cycles,
+                initial_cycles,
             )?;
 
             initial_cycles["has_initial_charge"].as_bool().ok_or_else(|| {
@@ -108,7 +108,7 @@ impl PlanValidation {
             Helpers::validate_string(description, "description",)?;
         }
 
-        if let Some(_,) = parsed.get("status",) {
+        if parsed.get("status",).is_some() {
             Helpers::validate_allow_values_numeric(
                 &parsed,
                 constant::STATUS,

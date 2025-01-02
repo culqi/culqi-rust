@@ -20,7 +20,7 @@ impl Order {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.post(ORDER_URL, order_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn get(
@@ -28,8 +28,8 @@ impl Order {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.get(ORDER_URL, &id, custom_headers,).await;
-        return handle_response(result,).await;
+        let result = client.get(ORDER_URL, id, custom_headers,).await;
+        handle_response(result,).await
     }
 
     pub async fn all<T: Serialize,>(
@@ -38,7 +38,7 @@ impl Order {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.all(ORDER_URL, params, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn delete(
@@ -46,8 +46,8 @@ impl Order {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.delete(ORDER_URL, &id, custom_headers,).await;
-        return handle_response(result,).await;
+        let result = client.delete(ORDER_URL, id, custom_headers,).await;
+        handle_response(result,).await
     }
 
     pub async fn patch<T: Serialize,>(
@@ -56,8 +56,8 @@ impl Order {
         order_request: &T,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.patch(ORDER_URL, &id, &order_request, custom_headers,).await;
-        return handle_response(result,).await;
+        let result = client.patch(ORDER_URL, id, &order_request, custom_headers,).await;
+        handle_response(result,).await
     }
 
     pub async fn confirm(
@@ -68,7 +68,7 @@ impl Order {
         let path = get_url_replace_id(ORDER_CONFIRM_URL, id,);
         let empty_body = json!({});
         let result = client.post(&path, &Some(empty_body,), custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn type_confirm<T: Serialize,>(
@@ -77,6 +77,6 @@ impl Order {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.post(ORDER_CONFIRM_TYPE_URL, order_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 }

@@ -503,6 +503,10 @@ cargo test
 ```bash
 cargo test tests::test_plan_update
 ```
+## Formatea el proyecto 
+```bash
+cargo +nightly fmt
+```
 
 ## Documentación
 

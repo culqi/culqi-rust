@@ -19,7 +19,7 @@ impl Charge {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.post(CHARGE_URL, charge_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn get(
@@ -28,7 +28,7 @@ impl Charge {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.get(CHARGE_URL, id, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn all<T: Serialize,>(
@@ -37,7 +37,7 @@ impl Charge {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.all(CHARGE_URL, params, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn patch<T: Serialize,>(
@@ -47,7 +47,7 @@ impl Charge {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.patch(CHARGE_URL, id, charge_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn capture(
@@ -58,6 +58,6 @@ impl Charge {
         let path = get_url_replace_id(CHARGE_CONFIRM_URL, id,);
         let empty_body = json!({});
         let result = client.post(&path, &Some(empty_body,), custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 }

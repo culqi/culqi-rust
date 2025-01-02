@@ -19,7 +19,7 @@ impl Token {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.post(TOKEN_URL, token_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn get(
@@ -28,7 +28,7 @@ impl Token {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.get(TOKEN_URL, id, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn all<T: Serialize,>(
@@ -37,7 +37,7 @@ impl Token {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.all(TOKEN_URL, params, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn patch<T: Serialize,>(
@@ -47,7 +47,7 @@ impl Token {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.patch(TOKEN_URL, id, token_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn yape<T: Serialize,>(
@@ -56,6 +56,6 @@ impl Token {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.post(TOKEN_YAPE_URL, token_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 }

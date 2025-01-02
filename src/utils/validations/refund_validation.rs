@@ -15,7 +15,7 @@ impl RefundValidation {
         Helpers::validate_field(&parsed, constant::CHARGE_ID, constant::CHARGE_KEY,)?;
         Helpers::validate_parameters_numeric(vec!["amount"], &parsed,)?;
 
-        if let Some(_,) = parsed.get(constant::REASON,) {
+        if parsed.get(constant::REASON,).is_some() {
             Helpers::validate_allow_values_string(
                 &parsed,
                 constant::REASON,

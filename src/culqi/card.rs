@@ -16,7 +16,7 @@ impl Card {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.post(CARD_URL, card_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn get(
@@ -25,7 +25,7 @@ impl Card {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.get(CARD_URL, id, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn all<T: Serialize,>(
@@ -34,7 +34,7 @@ impl Card {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.all(CARD_URL, params, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn patch<T: Serialize,>(
@@ -44,7 +44,7 @@ impl Card {
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
         let result = client.patch(CARD_URL, id, card_request, custom_headers,).await;
-        return handle_response(result,).await;
+        handle_response(result,).await
     }
 
     pub async fn delete(
@@ -52,7 +52,7 @@ impl Card {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<warp::reply::Response, warp::Rejection,> {
-        let result = client.delete(CARD_URL, &id, custom_headers,).await;
-        return handle_response(result,).await;
+        let result = client.delete(CARD_URL, id, custom_headers,).await;
+        handle_response(result,).await
     }
 }
