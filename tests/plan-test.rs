@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::plan::Plan;
+use LibCulqi::culqi::plan::Plan;
 mod config;
 mod header;
 mod request;

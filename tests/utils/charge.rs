@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::charge::Charge;
+use LibCulqi::culqi::charge::Charge;
 
 use super::util::{assert_status, create_client, parse_response_body};
 use crate::request::charge::create_charge_request;

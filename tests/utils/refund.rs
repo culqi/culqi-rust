@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::refund::Refund;
+use LibCulqi::culqi::refund::Refund;
 
 use super::util::{assert_status, create_client, parse_response_body};
 use crate::request::refund::create_refund_request;

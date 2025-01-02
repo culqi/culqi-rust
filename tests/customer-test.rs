@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::customer::Customer;
+use LibCulqi::culqi::customer::Customer;
 mod config;
 mod header;
 mod request;

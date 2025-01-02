@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::customer::Customer;
+use LibCulqi::culqi::customer::Customer;
 
 use super::util::{assert_status, create_client, parse_response_body};
 use crate::request::customer::create_customer_request;

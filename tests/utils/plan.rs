@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::plan::Plan;
+use LibCulqi::culqi::plan::Plan;
 
 use super::util::{assert_status, create_client, parse_response_body};
 use crate::request::plan::create_plan_request;

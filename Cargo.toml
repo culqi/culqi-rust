@@ -1,5 +1,5 @@
 [package]
-name = "BrandoCulqi"
+name = "LibCulqi"
 version = "1.0.2"
 edition = "2021"
 description = "API bindings for the Culqi v2 HTTP API"

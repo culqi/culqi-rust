@@ -181,7 +181,7 @@ const SECRET_KEY : &str = "Ingresa tu llave privada";
 
 let request_create_token = json!({
     "amount": 2000,
-    "charge_id": "chr_test_3xWxRF1Zswgp6C7N", // Crear cargo -> Id
+    "charge_id": "chr_test_3xWxRF1Zswgp6C7N", // Crear Cargo -> Id
     "reason": "fraudulento"
 })
 
@@ -501,7 +501,7 @@ cargo test
 ```
  - Comando para ejecutar una prueba especificada
 ```bash
-cargo test tests::test_token_encrypt
+cargo test tests::test_plan_update
 ```
 
 ## Documentación

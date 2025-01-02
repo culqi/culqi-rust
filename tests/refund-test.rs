@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::refund::Refund;
+use LibCulqi::culqi::refund::Refund;
 mod config;
 mod header;
 mod request;

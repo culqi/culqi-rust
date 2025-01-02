@@ -1,4 +1,4 @@
-#![crate_name = "BrandoCulqi"]
+#![crate_name = "LibCulqi"]
 #![allow(non_snake_case)]
 
 // private module

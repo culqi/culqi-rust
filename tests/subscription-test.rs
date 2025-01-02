@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::subscription::Subscription;
+use LibCulqi::culqi::subscription::Subscription;
 mod config;
 mod header;
 mod request;
