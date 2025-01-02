@@ -1,17 +1,18 @@
 use std::collections::HashMap;
 
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
-use crate::utils::token;
+use crate::utils::{token, util};
 
 #[allow(dead_code)]
 pub async fn create_charge_request() -> HashMap<String, Value,> {
     let token_id: String = token::create_token().await;
+    let email = util::generate_email();
 
     let mut charge_request = HashMap::new();
     charge_request.insert("amount".to_string(), json!(10000),);
     charge_request.insert("currency_code".to_string(), json!("PEN"),);
-    charge_request.insert("email".to_string(), json!("accept@culqi.com"),);
+    charge_request.insert("email".to_string(), json!(email),);
     charge_request.insert("source_id".to_string(), json!(token_id),);
     charge_request.insert("capture".to_string(), json!(false),);
 

@@ -5,7 +5,7 @@ mod request;
 mod utils;
 
 #[cfg(test)]
-mod tests {
+mod plan_tests {
     use header::header_rsa;
     use request::plan::{create_plan_request, request_plan_all, request_plan_update};
     use serial_test::serial;

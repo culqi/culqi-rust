@@ -6,7 +6,7 @@ mod utils;
 use request::order::{create_order_request, update_order_request};
 
 #[cfg(test)]
-mod tests {
+mod oder_tests {
     use header::header_rsa;
     use request::order::{order_type_confirm_request, request_order_all};
     use serial_test::serial;

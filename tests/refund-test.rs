@@ -5,7 +5,7 @@ mod request;
 mod utils;
 
 #[cfg(test)]
-mod tests {
+mod refund_tests {
     use header::header_rsa;
     use request::refund::{create_refund_request, request_refund_all, update_refund_request};
     use serial_test::serial;

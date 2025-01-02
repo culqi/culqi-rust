@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use chrono::Utc;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
 #[allow(dead_code)]
 pub fn create_plan_request() -> HashMap<String, Value,> {

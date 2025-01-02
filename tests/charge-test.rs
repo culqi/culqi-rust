@@ -5,7 +5,7 @@ mod request;
 mod utils;
 
 #[cfg(test)]
-mod tests {
+mod charge_tests {
     use header::{charge::get_header_charge_recurrent, header_rsa};
     use request::charge::{create_charge_request, request_charge_all, update_charge_request};
     use serial_test::serial;

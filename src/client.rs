@@ -1,5 +1,5 @@
 use anyhow::Result;
-use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderName, HeaderValue};
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::Serialize;
 use serde_json::Value;
 
@@ -7,7 +7,7 @@ use crate::utils::{
     constants::{errors::error, header},
     custom_exception::CustomException,
     encrypt::encrypt,
-    urls::{TOKEN_URL, get_url},
+    urls::{get_url, TOKEN_URL},
     validations::validation::Validation,
 };
 pub struct Client {
