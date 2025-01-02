@@ -1,6 +1,7 @@
-use BrandoCulqi::client::Client;
+use chrono::Utc;
 use hyper::body::to_bytes;
 use serde_json::Value;
+use BrandoCulqi::client::Client;
 
 use crate::config::credentials::{PUBLIC_KEY, RSA_KEY, SECRET_KEY};
 
@@ -30,4 +31,14 @@ pub async fn parse_response_body(response: hyper::Response<hyper::Body,>,) -> Va
         Ok(json,) => json,
         Err(_,) => panic!("Error al parsear la respuesta JSON"),
     }
+}
+
+pub fn generate_email() -> String {
+    let user_name = Utc::now().timestamp_millis().to_string();
+    let domain = "@culqi.com";
+
+    let email = format!("{}{}", user_name, domain);
+    let truncated_email = &email[..std::cmp::min(25, email.len(),)];
+
+    truncated_email.to_string()
 }

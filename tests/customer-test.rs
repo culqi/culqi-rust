@@ -5,7 +5,7 @@ mod request;
 mod utils;
 
 #[cfg(test)]
-mod tests {
+mod customer_tests {
     use header::header_rsa;
     use request::customer::{
         create_customer_request, request_customer_all, update_customer_request,

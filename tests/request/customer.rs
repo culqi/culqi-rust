@@ -1,20 +1,17 @@
 use std::collections::HashMap;
 
-use chrono::Utc;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
+
+use crate::utils::util;
 
 #[allow(dead_code)]
 pub fn create_customer_request() -> HashMap<String, Value,> {
-    let user_name = Utc::now().timestamp_millis().to_string();
-    let domain = "@culqi.com";
-
-    let email = format!("{}{}", user_name, domain);
-    let truncated_email = &email[..std::cmp::min(25, email.len(),)];
+    let email = util::generate_email();
 
     let mut customer_request = HashMap::new();
     customer_request.insert("first_name".to_string(), json!("Brando"),);
     customer_request.insert("last_name".to_string(), json!("Carquin"),);
-    customer_request.insert("email".to_string(), json!(truncated_email),);
+    customer_request.insert("email".to_string(), json!(email),);
     customer_request.insert("address".to_string(), json!("San Francisco Bay Area"),);
     customer_request.insert("address_city".to_string(), json!("Palo Alto"),);
     customer_request.insert("country_code".to_string(), json!("US"),);

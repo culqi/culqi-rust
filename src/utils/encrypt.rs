@@ -1,10 +1,10 @@
 use std::{collections::HashMap, error::Error, fmt, io::Error as IoError, string::FromUtf8Error};
 
 use aes_gcm::{
+    aead::{generic_array::GenericArray, Aead},
     Aes256Gcm, KeyInit,
-    aead::{Aead, generic_array::GenericArray},
 };
-use base64::{DecodeError, Engine, engine::general_purpose};
+use base64::{engine::general_purpose, DecodeError, Engine};
 use openssl::{
     encrypt::Encrypter,
     hash::MessageDigest,
@@ -18,7 +18,7 @@ use serde_json::Value;
 pub enum MyError {
     AesGcmError(aes_gcm::Error,),
     RsaError(openssl::error::ErrorStack,),
-    JsonError(serde_json::Error,), // Add this line
+    JsonError(serde_json::Error,),
     Other(String,),
     IoError(IoError,),
     Decode(DecodeError,),

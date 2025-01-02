@@ -6,7 +6,7 @@ mod utils;
 use request::token::{create_token_request, create_token_yape_request, update_token_request};
 
 #[cfg(test)]
-mod tests {
+mod token_tests {
     use header::header_rsa;
     use request::token::request_token_all;
     use serial_test::serial;

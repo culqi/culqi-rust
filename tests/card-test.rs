@@ -5,7 +5,7 @@ mod request;
 mod utils;
 
 #[cfg(test)]
-mod tests {
+mod card_tests {
     use header::header_rsa;
     use request::card::{create_card_request, request_card_all, update_card_request};
     use serial_test::serial;

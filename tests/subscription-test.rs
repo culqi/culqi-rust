@@ -5,7 +5,7 @@ mod request;
 mod utils;
 
 #[cfg(test)]
-mod tests {
+mod subscription_tests {
     use header::header_rsa;
     use request::subscription::{
         create_subscription_request, request_subscription_all, update_subscription_request,

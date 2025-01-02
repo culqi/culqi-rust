@@ -1,15 +1,19 @@
 use std::collections::HashMap;
 
-use serde_json::{Value, json};
+use serde_json::{json, Value};
+
+use crate::utils::util;
 
 #[allow(dead_code)]
 pub fn create_token_request() -> HashMap<String, serde_json::Value,> {
+    let email = util::generate_email();
+
     let mut token_request = HashMap::new();
-    token_request.insert("card_number".to_string(), json!("371212121212122"),);
-    token_request.insert("cvv".to_string(), json!("2841"),);
-    token_request.insert("expiration_month".to_string(), json!("11"),);
+    token_request.insert("card_number".to_string(), json!("4111111111111111"),);
+    token_request.insert("cvv".to_string(), json!("123"),);
+    token_request.insert("expiration_month".to_string(), json!("09"),);
     token_request.insert("expiration_year".to_string(), json!("2025"),);
-    token_request.insert("email".to_string(), json!("accept@culqi.com"),);
+    token_request.insert("email".to_string(), json!(email),);
 
     let mut metadata = HashMap::new();
     metadata.insert("dni".to_string(), json!("12345678"),);
