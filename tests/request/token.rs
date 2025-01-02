@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[allow(dead_code)]
 pub fn create_token_request() -> HashMap<String, serde_json::Value,> {
