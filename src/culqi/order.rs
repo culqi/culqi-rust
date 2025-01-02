@@ -2,13 +2,13 @@ use crate::{
     client::Client,
     utils::{
         response::handle_response,
-        urls::{get_url_replace_id, ORDER_CONFIRM_TYPE_URL, ORDER_CONFIRM_URL, ORDER_URL},
+        urls::{ORDER_CONFIRM_TYPE_URL, ORDER_CONFIRM_URL, ORDER_URL, get_url_replace_id},
     },
 };
 extern crate serde_json;
 use anyhow::Result;
 use serde::Serialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use warp;
 
 #[derive(Debug, Serialize,)]

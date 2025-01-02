@@ -1,15 +1,14 @@
 use anyhow::Result;
-use reqwest::header::{HeaderMap, HeaderName, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
+use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderName, HeaderValue};
 use serde::Serialize;
 use serde_json::Value;
 
-use crate::{
-    utils::{
-        encrypt::encrypt,
-        urls::{get_url, TOKEN_URL},
-        CustomException::CustomException,
-    },
-    validation::validate_if_action::ValidateIfAction,
+use crate::utils::{
+    constants::{errors::error, header},
+    custom_exception::CustomException,
+    encrypt::encrypt,
+    urls::{TOKEN_URL, get_url},
+    validations::validation::Validation,
 };
 pub struct Client {
     secret_key: String,
@@ -33,12 +32,6 @@ impl Client {
         isToken: bool,
         custom_headers: Option<Value,>,
     ) -> Result<HeaderMap, CustomException,> {
-        const X_CULQI_ENV_TEST: &str = "test";
-        const X_CULQI_ENV_LIVE: &str = "live";
-        const X_CULQI_CLIENT: &'static str = "culqi-rust";
-        const X_CULQI_CLIENT_VERSION: &'static str = "1.0.1";
-        const X_API_VERSION: &'static str = "2";
-
         let mut headers = HeaderMap::new();
 
         let token = if isToken {
@@ -47,14 +40,14 @@ impl Client {
             &self.secret_key
         };
 
-        let env = match token.contains("test",) {
-            true => X_CULQI_ENV_TEST,
-            false => X_CULQI_ENV_LIVE,
+        let env = match token.contains(header::X_CULQI_ENV_TEST,) {
+            true => header::X_CULQI_ENV_TEST,
+            false => header::X_CULQI_ENV_LIVE,
         };
 
         headers.insert(
-            "x-culqi-env",
-            HeaderValue::from_str(env,).expect("Failed to parse x-culqi-env",),
+            header::X_CULQI_ENV_KEY,
+            HeaderValue::from_str(env,).expect(header::X_CULQI_ENV_ERROR,),
         );
 
         headers.insert(
@@ -64,20 +57,22 @@ impl Client {
 
         headers.insert(
             CONTENT_TYPE,
-            HeaderValue::from_static("application/json; charset=utf-8",),
+            HeaderValue::from_static(header::CONTENT_TYPE,),
         );
 
         headers.insert(
-            "x-api-version",
-            X_API_VERSION.parse().expect("Failed to parse x-api-version",),
+            header::X_API_VERSION_KEY,
+            header::X_API_VERSION.parse().expect(header::X_API_VERSION_ERROR,),
         );
         headers.insert(
-            "x-culqi-client",
-            X_CULQI_CLIENT.parse().expect("Failed to parse x-culqi-client",),
+            header::X_CULQI_CLIENT_KEY,
+            header::X_CULQI_CLIENT.parse().expect(header::X_CULQI_CLIENT_ERROR,),
         );
         headers.insert(
-            "x-culqi-client-version",
-            X_CULQI_CLIENT_VERSION.parse().expect("Failed to parse x-culqi-client-version",),
+            header::X_CULQI_CLIENT_VERSION_KEY,
+            header::X_CULQI_CLIENT_VERSION
+                .parse()
+                .expect(header::X_CULQI_CLIENT_VERSION_ERROR,),
         );
 
         if let Some(custom_headers_value,) = custom_headers {
@@ -111,13 +106,11 @@ impl Client {
         custom_headers: Option<Value,>,
     ) -> Result<(String, u16,), (String, u16,),> {
         let mut json_body = serde_json::to_string(body,).map_err(|_| {
-            let error = CustomException::new(&"Error al convertir el cuerpo a JSON",);
+            let error = CustomException::new(error::REQUEST_ERROR,);
             (error.to_string(), 400,)
         },)?;
 
-        if let Err(validation_error,) = ValidateIfAction::validate_class(path, &json_body,) {
-            return Err((validation_error.to_string(), 400,),);
-        }
+        Validation::create(path, &json_body,)?;
 
         let isToken = path.contains(TOKEN_URL,);
         let headers_config = match self.get_headers(isToken, custom_headers,) {
@@ -128,19 +121,19 @@ impl Client {
         };
 
         // Validacion para encriptar
-        if headers_config.contains_key("x-culqi-rsa-id",) {
+        if headers_config.contains_key(header::X_CULQI_RSA_ID,) {
             if let Some(rsa_key,) = &self.rsa_key {
                 let encrypted_body = encrypt(&json_body, rsa_key, true,).map_err(|_| {
-                    let error = CustomException::new(&"Error al encriptar:",);
+                    let error = CustomException::new(error::ERROR_ENCRYPT,);
                     (error.to_string(), 400,)
                 },)?;
 
                 json_body = serde_json::to_string(&encrypted_body,).map_err(|_| {
-                    let error = CustomException::new(&"Error al convertir el cuerpo a JSON",);
+                    let error = CustomException::new(error::REQUEST_ERROR,);
                     (error.to_string(), 400,)
                 },)?;
             } else {
-                let error = CustomException::new("Se requiere una clave RSA",);
+                let error = CustomException::new(error::ERROR_RSA,);
                 return Err((error.to_string(), 400,),);
             }
         }
@@ -152,8 +145,7 @@ impl Client {
         let response = match response {
             Ok(resp,) => resp,
             Err(_,) => {
-                print!("Erro Client");
-                let error = CustomException::new("Error en la solicitud",);
+                let error = CustomException::new(error::GENERIC_ERROR,);
                 return Err((error.to_string(), 400,),);
             }
         };
@@ -173,9 +165,7 @@ impl Client {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<(String, u16,), (String, u16,),> {
-        if let Err(validation_error,) = ValidateIfAction::validate_id_class(path, &id,) {
-            return Err((validation_error.to_string(), 400,),);
-        }
+        Validation::resource_id(path, &id,)?;
 
         let headers_config = match self.get_headers(false, custom_headers,) {
             Ok(headers,) => headers,
@@ -189,8 +179,7 @@ impl Client {
         let response = match response {
             Ok(resp,) => resp,
             Err(_,) => {
-                print!("Erro Client");
-                let error = CustomException::new("Error en la solicitud",);
+                let error = CustomException::new(error::GENERIC_ERROR,);
                 return Err((error.to_string(), 400,),);
             }
         };
@@ -211,12 +200,11 @@ impl Client {
         custom_headers: Option<Value,>,
     ) -> Result<(String, u16,), (String, u16,),> {
         let json_body = serde_json::to_string(params,).map_err(|_| {
-            let error = CustomException::new(&"Error al convertir el cuerpo a JSON",);
+            let error = CustomException::new(error::REQUEST_ERROR,);
             (error.to_string(), 400,)
         },)?;
-        if let Err(validation_error,) = ValidateIfAction::validate_all_class(path, &json_body,) {
-            return Err((validation_error.to_string(), 400,),);
-        }
+
+        Validation::list(path, &json_body,)?;
 
         let headers_config = match self.get_headers(false, custom_headers,) {
             Ok(headers,) => headers,
@@ -248,8 +236,7 @@ impl Client {
         let response = match response {
             Ok(resp,) => resp,
             Err(_,) => {
-                print!("Erro Client");
-                let error = CustomException::new("Error en la solicitud",);
+                let error = CustomException::new(error::GENERIC_ERROR,);
                 return Err((error.to_string(), 400,),);
             }
         };
@@ -268,9 +255,7 @@ impl Client {
         id: &str,
         custom_headers: Option<Value,>,
     ) -> Result<(String, u16,), (String, u16,),> {
-        if let Err(validation_error,) = ValidateIfAction::validate_id_class(path, &id,) {
-            return Err((validation_error.to_string(), 400,),);
-        }
+        Validation::resource_id(path, &id,)?;
 
         let headers_config = match self.get_headers(false, custom_headers,) {
             Ok(headers,) => headers,
@@ -284,8 +269,7 @@ impl Client {
         let response = match response {
             Ok(resp,) => resp,
             Err(_,) => {
-                print!("Erro Client");
-                let error = CustomException::new("Error en la solicitud",);
+                let error = CustomException::new(error::GENERIC_ERROR,);
                 return Err((error.to_string(), 400,),);
             }
         };
@@ -306,15 +290,12 @@ impl Client {
         custom_headers: Option<Value,>,
     ) -> Result<(String, u16,), (String, u16,),> {
         let json_body = serde_json::to_string(body,).map_err(|_| {
-            let error = CustomException::new(&"Error al convertir el cuerpo a JSON",);
+            let error = CustomException::new(error::REQUEST_ERROR,);
             (error.to_string(), 400,)
         },)?;
 
-        if let Err(validation_error,) =
-            ValidateIfAction::validate_update_class(path, &id, &json_body,)
-        {
-            return Err((validation_error.to_string(), 400,),);
-        }
+        Validation::resource_id(path, &id,)?;
+        Validation::update(path, &json_body,)?;
 
         let headers_config = match self.get_headers(false, custom_headers,) {
             Ok(headers,) => headers,
@@ -330,8 +311,7 @@ impl Client {
         let response = match response {
             Ok(resp,) => resp,
             Err(_,) => {
-                print!("Erro Client");
-                let error = CustomException::new("Error en la solicitud",);
+                let error = CustomException::new(error::GENERIC_ERROR,);
                 return Err((error.to_string(), 400,),);
             }
         };

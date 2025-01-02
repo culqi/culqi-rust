@@ -1,13 +1,12 @@
 use std::{collections::HashMap, error::Error, fmt, io::Error as IoError, string::FromUtf8Error};
 
 use aes_gcm::{
-    aead::{generic_array::GenericArray, Aead},
     Aes256Gcm, KeyInit,
+    aead::{Aead, generic_array::GenericArray},
 };
-use base64::{engine::general_purpose, DecodeError, Engine};
-// use rsa::{PublicKey};
-use openssl::encrypt::Encrypter;
+use base64::{DecodeError, Engine, engine::general_purpose};
 use openssl::{
+    encrypt::Encrypter,
     hash::MessageDigest,
     pkey::PKey,
     rsa::{Padding, Rsa},
@@ -31,7 +30,7 @@ impl fmt::Display for MyError {
         match *self {
             MyError::AesGcmError(ref err,) => write!(f, "AES GCM error: {}", err),
             MyError::RsaError(ref err,) => write!(f, "RSA error: {}", err),
-            MyError::JsonError(ref err,) => write!(f, "JSON error: {}", err), // And this line
+            MyError::JsonError(ref err,) => write!(f, "JSON error: {}", err),
             MyError::Other(ref err,) => write!(f, "Other error: {}", err),
             MyError::IoError(ref err,) => write!(f, "IO error: {}", err),
             MyError::Decode(ref err,) => write!(f, "IO error: {}", err),
@@ -55,19 +54,13 @@ impl Error for MyError {
 }
 impl From<String,> for MyError {
     fn from(error: String,) -> Self {
-        // Aquí puedes definir cómo convertir el error `FromUtf8Error` en tu error
-        // personalizado Esto dependerá de cómo hayas definido `MyError`
-        MyError::Other(error,) // Por ejemplo, si agregas un variant `Utf8Error`
-                               // en tu enum `MyError`
+        MyError::Other(error,)
     }
 }
 
 impl From<FromUtf8Error,> for MyError {
     fn from(error: FromUtf8Error,) -> Self {
-        // Aquí puedes definir cómo convertir el error `FromUtf8Error` en tu error
-        // personalizado Esto dependerá de cómo hayas definido `MyError`
-        MyError::Utf8Error(error,) // Por ejemplo, si agregas un variant
-                                   // `Utf8Error` en tu enum `MyError`
+        MyError::Utf8Error(error,)
     }
 }
 impl From<IoError,> for MyError {
@@ -96,10 +89,7 @@ impl From<serde_json::Error,> for MyError {
 
 impl From<DecodeError,> for MyError {
     fn from(error: DecodeError,) -> Self {
-        // Aquí puedes definir cómo convertir el error `DecodeError` en tu error
-        // personalizado Esto dependerá de cómo hayas definido `MyError`
-        MyError::Decode(error,) // Por ejemplo, si tienes un variant `Decode` en
-                                // tu enum `MyError`
+        MyError::Decode(error,)
     }
 }
 
@@ -113,48 +103,36 @@ pub fn encrypt(
     let json_data: Value = if is_json {
         serde_json::from_str(&data,)?
     } else {
-        data.into() // or handle non-JSON data as needed
+        data.into()
     };
-    // Generate a 256-bit random key for AES encryption
     let key: [u8; 32] = rand::thread_rng().r#gen();
-
-    // GCM mode requires a 96-bit (12 bytes) random initialization vector
     let iv: [u8; 12] = rand::thread_rng().r#gen();
 
     let cipher = Aes256Gcm::new(GenericArray::from_slice(&key,),);
     let nonce = GenericArray::from_slice(&iv,);
 
-    // The data to be encrypted
     let plaintext = serde_json::to_string(&json_data,)?.as_bytes().to_vec();
-
-    // Perform encryption
     let mut ciphertext = cipher.encrypt(nonce, &plaintext[..],)?;
     ciphertext = Vec::from(&ciphertext[..ciphertext.len() - 16],);
 
-    // Convert encrypted data to base64 string
     let encrypted_data = general_purpose::STANDARD.encode(&ciphertext,);
 
     let public_key = Rsa::public_key_from_pem(rsa_public_key.as_bytes(),).unwrap();
     let public_key = PKey::from_rsa(public_key,).unwrap();
 
-    // Encrypt message
     let mut encrypter = Encrypter::new(&public_key,).unwrap();
     encrypter.set_rsa_padding(Padding::PKCS1_OAEP,).unwrap();
     encrypter.set_rsa_oaep_md(MessageDigest::sha256(),).unwrap();
 
-    // Create an output buffer
     let buffer_len = encrypter.encrypt_len(&key,).unwrap();
     let mut encrypted_key = vec![0; buffer_len];
 
-    // Encrypt and truncate buffer
     let encrypted_len = encrypter.encrypt(&key, &mut encrypted_key,).unwrap();
     encrypted_key.truncate(encrypted_len,);
 
-    // Create an output buffer
     let buffer_len = encrypter.encrypt_len(&iv,).unwrap();
     let mut encrypted_iv = vec![0; buffer_len];
 
-    // Encrypt and truncate buffer
     let encrypted_len = encrypter.encrypt(&iv, &mut encrypted_iv,).unwrap();
     encrypted_iv.truncate(encrypted_len,);
 
