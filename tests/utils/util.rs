@@ -1,6 +1,6 @@
+use BrandoCulqi::client::Client;
 use hyper::body::to_bytes;
 use serde_json::Value;
-use BrandoCulqi::client::Client;
 
 use crate::config::credentials::{PUBLIC_KEY, RSA_KEY, SECRET_KEY};
 

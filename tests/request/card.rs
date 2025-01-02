@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::utils::{customer, token};
 
@@ -36,6 +36,14 @@ pub async fn update_card_request() -> Value {
 #[allow(dead_code)]
 pub fn request_card_all() -> Value {
     json!({
-        "limit": 1
+        "limit": 1,
+        "card_brand": "Visa",
+        "card_type": "debito",
+        "device_type": "desktop",
+        "country_code": "PE",
+        "creation_date_from": 1734973160554i64,
+        "creation_date_to": 1734973160554i64,
+        "before": "crd_test_a5FcsCc4dfqBne20",
+        "after": "crd_test_a5FcsCc4dfqBne20",
     })
 }

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use chrono::{Duration, Utc};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[allow(dead_code)]
 pub fn create_order_request() -> HashMap<String, serde_json::Value,> {
@@ -36,7 +36,7 @@ pub fn create_order_request() -> HashMap<String, serde_json::Value,> {
 #[allow(dead_code)]
 pub fn request_order_all() -> Value {
     json!({
-        "limit": 1
+        "limit": 1,
     })
 }
 
