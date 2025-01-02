@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::order::Order;
+use LibCulqi::culqi::order::Order;
 
 use super::util::{assert_status, create_client, parse_response_body};
 use crate::request::order::create_order_request;

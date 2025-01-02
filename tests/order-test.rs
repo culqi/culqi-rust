@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::order::Order;
+use LibCulqi::culqi::order::Order;
 mod config;
 mod header;
 mod request;

@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::card::Card;
+use LibCulqi::culqi::card::Card;
 
 use super::util::{assert_status, create_client, parse_response_body};
 use crate::request::card::create_card_request;

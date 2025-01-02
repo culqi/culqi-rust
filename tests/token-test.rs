@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::token::Token;
+use LibCulqi::culqi::token::Token;
 mod config;
 mod header;
 mod request;

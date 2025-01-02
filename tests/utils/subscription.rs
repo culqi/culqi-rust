@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::subscription::Subscription;
+use LibCulqi::culqi::subscription::Subscription;
 
 use super::util::{assert_status, create_client, parse_response_body};
 use crate::request::subscription::create_subscription_request;

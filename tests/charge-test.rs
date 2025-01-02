@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::charge::Charge;
+use LibCulqi::culqi::charge::Charge;
 mod config;
 mod header;
 mod request;

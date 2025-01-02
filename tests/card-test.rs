@@ -1,4 +1,4 @@
-use BrandoCulqi::culqi::card::Card;
+use LibCulqi::culqi::card::Card;
 mod config;
 mod header;
 mod request;
