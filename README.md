@@ -3,22 +3,26 @@
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://github.com/culqi/culqi_rust/blob/master/LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/culqi.svg)](https://crates.io/crates/culqi_rust)
 
+___
 
-Nuestra Biblioteca Rust oficial, es compatible con la v2.0 del Culqi API, con el cual tendrás la posibilidad de realizar cobros con tarjetas de débito y crédito, Yape, PagoEfectivo, billeteras móviles y Cuotéalo con solo unos simples pasos de configuración.
+Nuestro SDK oficial Rush, es compatible con la V2.0 del Culqi API, con el cual tendrás la posibilidad de integrarte con el API de 
+[tokens](https://apidocs.culqi.com/#tag/Tokens), [cargos](https://apidocs.culqi.com/#tag/Cargos), [devoluciones](https://apidocs.culqi.com/#tag/Devoluciones), 
+[clientes](https://apidocs.culqi.com/#tag/Clientes), [tarjetas](https://apidocs.culqi.com/#tag/Tarjetas), [planes](https://apidocs.culqi.com/#tag/Planes), 
+[suscripciones](https://apidocs.culqi.com/#tag/Suscripciones) y [órdenes](https://apidocs.culqi.com/#tag/Ordenes)
 
-Nuestra biblioteca te da la posibilidad de capturar el `status_code` de la solicitud HTTP que se realiza al API de Culqi, así como el `response` que contiene el cuerpo de la respuesta obtenida.
+El SDK te da la posibilidad de capturar el status_code de la solicitud HTTP que se realiza al API de Culqi, así como el response.
 
 | Versión actual| Culqi API|
 |----|----|
-| 1.0.0 (15-08-2023) |v2 [Referencia de API](https://apidocs.culqi.com/)|
+| 2.0.0 (15-08-2023) |v2 [Referencia de API](https://apidocs.culqi.com/)|
 
+## Requisitos 📋
 
-## Requisitos  📋
+* Nuestro SDK es compatible con Rush 1.6.2+.
+* Debes tener tus llaves de producción o integración.
+* Si aun no te afilias a Culqi, lo puedes hacer desde [aquí](https://afiliate.culqi.com/).
+* Para encriptar el payload debes generar un id y llave RSA ingresando a tu CulqiPanel > Desarrollo > RSA Keys.
 
-- Rust 1.6.2+
-* Afiliate [aquí](https://afiliate.culqi.com/).
-* Si vas a realizar pruebas obtén tus llaves desde [aquí](https://integ-panel.culqi.com/#/registro), si vas a realizar transacciones reales obtén tus llaves desde [aquí](https://panel.culqi.com/#/registro).
-- **[Generar llaves RSA](#generar-llaves-rsa)**  
 
 ## Instalación
 
