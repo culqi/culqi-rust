@@ -89,10 +89,6 @@ Lo recomendable es generar los 'tokens' con [Culqi Checkout v4](https://docs.cul
 
 > Recuerda que cuando interactúas directamente con el [API Token](https://apidocs.culqi.com/#tag/Tokens/operation/crear-token) necesitas cumplir la normativa de PCI DSS 3.2. Por ello, te pedimos que llenes el [formulario SAQ-D](https://listings.pcisecuritystandards.org/documents/SAQ_D_v3_Merchant.pdf) y lo envíes al buzón de riesgos Culqi.
 
-```go
-statusCode, res, err := culqi.CreateToken(jsonData)
-```
-
 ### Crear un cargo
 
 Crear un cargo significa cobrar una venta a una tarjeta. Para esto previamente deberías generar el  `token` y enviarlo en parámetro **source_id**.
